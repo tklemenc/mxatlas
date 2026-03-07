@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MXmap — Email Sovereignty of Swiss Municipalities</title>
 <meta name="description" content="Interactive map showing where Swiss municipalities host their official email. DNS analysis of all ~2,100 municipalities, color-coded by provider. Visualizing the impact of the US CLOUD Act on Swiss digital sovereignty.">
 <meta name="keywords" content="Switzerland, municipalities, email, sovereignty, CLOUD Act, MX records, SPF, DNS, Microsoft 365, Google Workspace, digital sovereignty, data protection">
@@ -32,7 +32,7 @@
   .separator { color: #555; font-size: 15px; }
   .tagline { color: #a0a0b0; font-size: 13px; white-space: nowrap; }
   .header-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-  .updated { color: #a4a4a4; font-size: 11px; white-space: nowrap; }
+  .updated { font-size: 11px; color: #888; }
   .toggle-info {
     background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
     color: #ccc; font-size: 13px; font-weight: 500; padding: 5px 14px; border-radius: 4px; cursor: pointer;
@@ -58,8 +58,10 @@
     font-weight: 600; cursor: pointer; padding: 0; color: #333;
   }
   .legend-content { }
+  .info-title { display: none; font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 12px; }
   @media (max-width: 600px) {
     .separator, .tagline { display: none; }
+    .info-title { display: block; }
     .info-grid { grid-template-columns: 1fr; }
     .legend-toggle { display: block; }
     .legend.legend-collapsed .legend-content { display: none; }
@@ -67,6 +69,7 @@
     .legend-error-link { display: none; }
   }
   #map { flex: 1; width: 100%; }
+  .leaflet-bottom.leaflet-right { bottom: env(safe-area-inset-bottom, 0px); }
   .legend {
     background: white; padding: 10px 14px; border-radius: 6px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2); font-size: 13px; line-height: 1.8;
@@ -115,27 +118,23 @@
     <span class="tagline">Email Sovereignty of Swiss Municipalities</span>
   </div>
   <div class="header-right">
-    <span id="generated" class="updated"></span>
     <button class="toggle-info" id="toggle-info" onclick="toggleInfo()">About &#9652;</button>
   </div>
 </div>
 <div id="info-bar">
+  <h2 class="info-title">Email Sovereignty of Swiss Municipalities</h2>
   <div class="info-grid">
     <div class="info-card">
       <h3>What is this?</h3>
-      <p>Interactive map of where Swiss municipalities host official email. Based on automated DNS analysis (MX + SPF) of all ~2,100 municipalities. Color-coded by provider.</p>
+      <p>Email hosting map of all ~2,100 Swiss municipalities, based on automated DNS analysis (MX + SPF). See legend for provider colors.</p>
     </div>
     <div class="info-card">
       <h3>Why does it matter?</h3>
-      <p>The US CLOUD Act (2018) lets US authorities force American cloud providers (Microsoft, Google, Amazon) to hand over data regardless of data center location. Nearly half of Swiss municipalities route email through US infrastructure, raising digital sovereignty questions.</p>
-    </div>
-    <div class="info-card">
-      <h3>Who has access?</h3>
-      <p>US-hosted email: US law enforcement/intelligence can access without the Swiss justice system. Swiss-hosted: remains under Swiss jurisdiction and data protection law.</p>
+      <p>The US CLOUD Act (2018) lets US authorities force American cloud providers to hand over data — regardless of where it's stored. A substantial amount of Swiss municipalities route official email through US infrastructure.</p>
     </div>
     <div class="info-card">
       <h3>Who made this?</h3>
-      <p>Created by David Huser. Open source — <a href="https://github.com/davidhuser/mxmap" target="_blank">view on GitHub</a>. Can have bugs, please report them via GitHub.</p>
+      <p>Created by David Huser. Open source — <a href="https://github.com/davidhuser/mxmap" target="_blank">view on GitHub</a>.<br><span id="generated" class="updated"></span></p>
     </div>
   </div>
 </div>
@@ -258,7 +257,7 @@ async function loadData() {
   if (dnsData.generated) {
     const date = new Date(dnsData.generated);
     document.getElementById('generated').textContent =
-      'Last updated: ' + date.toLocaleString('de-CH', { dateStyle: 'medium', timeStyle: 'short' });
+      'Data last updated: ' + date.toLocaleString('de-CH', { dateStyle: 'medium', timeStyle: 'short' });
   }
 
   // Legend with counts
