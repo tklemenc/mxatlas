@@ -1,14 +1,14 @@
 {
-  "generated":"2026-03-07T05:00:49Z",
+  "generated":"2026-03-07T12:41:57Z",
   "total":2171,
   "counts":{
     "aws":27,
     "google":3,
-    "infomaniak":115,
+    "infomaniak":118,
     "merged":4,
-    "microsoft":961,
-    "sovereign":1032,
-    "unknown":29
+    "microsoft":964,
+    "sovereign":1040,
+    "unknown":15
   },
   "municipalities":{
     "1":{
@@ -338,7 +338,7 @@
         "mta1.abxsec.com",
         "mta2.abxsec.com"
       ],
-      "spf":"",
+      "spf":"v=spf1 mx include:_spf.abxsec.com ~all",
       "provider":"sovereign"
     },
     "39":{
@@ -372,7 +372,7 @@
         "mx1.rufcloud.ch",
         "mx2.rufcloud.ch"
       ],
-      "spf":"",
+      "spf":"v=spf1 mx include:spf.customer.swiss-egov.cloud include:_spf.i-web.ch ~all",
       "provider":"sovereign"
     },
     "43":{
@@ -380,9 +380,12 @@
       "name":"Volken",
       "canton":"",
       "domain":"volken.ch",
-      "mx":[],
-      "spf":"",
-      "provider":"unknown"
+      "mx":[
+        "mx1.rufcloud.ch",
+        "mx2.rufcloud.ch"
+      ],
+      "spf":"v=spf1 mx include:spf.customer.swiss-egov.cloud include:_spf.i-web.ch ~all",
+      "provider":"sovereign"
     },
     "51":{
       "bfs":"51",
@@ -404,7 +407,7 @@
         "mta1.abxsec.com",
         "mta2.abxsec.com"
       ],
-      "spf":"",
+      "spf":"v=spf1 mx include:_spf.abxsec.com mx:hin.ch ~all",
       "provider":"sovereign"
     },
     "53":{
@@ -416,7 +419,7 @@
         "buelach-ch.mail.protection.outlook.com",
         "mailprotect3.itexacloud.ch"
       ],
-      "spf":"",
+      "spf":"v=spf1 a mx ip4:77.237.208.45 a:mail01.refline.ch a:mail02.refline.ch a:mail.friedaweb.de include:spf.rtp.ch include:spf.sendinblue.com include:spf.protection.outlook.com include:_spf.abxsec.com -all",
       "provider":"microsoft"
     },
     "54":{
@@ -435,9 +438,14 @@
       "name":"Eglisau",
       "canton":"",
       "domain":"eglisau.ch",
-      "mx":[],
-      "spf":"",
-      "provider":"unknown"
+      "mx":[
+        "asgate01.spamcontrol.beltronic.ch",
+        "asgate02.spamcontrol.beltronic.ch",
+        "asgate03.spamcontrol.beltronic.ch",
+        "asgate04.spamcontrol.beltronic.ch"
+      ],
+      "spf":"v=spf1 a mx include:spf.hornetsecurity.com include:spf.crsend.com include:spf.protection.cyon.net include:servers.mcsv.net include:mail.kidesia.com include:_spf.sui-inter.net  ip4:80.74.128.0/19 ip4:46.245.188.53  ip4:91.102.199.128/29 +mx:hin.ch ~all",
+      "provider":"sovereign"
     },
     "56":{
       "bfs":"56",
@@ -1756,10 +1764,10 @@
       "canton":"",
       "domain":"zuerich.ch",
       "mx":[
-        "mx3.stadt-zuerich.ch",
-        "mx4.stadt-zuerich.ch"
+        "mx1.mail.hostpoint.ch",
+        "mx2.mail.hostpoint.ch"
       ],
-      "spf":"v=spf1 ip4:194.56.33.0/26 ip4:185.125.165.24/31 ip4:213.52.186.141 ip4:213.52.186.142 ip4:35.214.208.81 ip4:35.214.213.218 ip4:35.214.183.81 ip4:35.214.212.238 include:spf1.zuerich.ch include:spf2.zuerich.ch ~all",
+      "spf":"v=spf1 redirect=spf-permissive.mail.hostpoint.ch",
       "provider":"sovereign"
     },
     "291":{
@@ -2960,9 +2968,11 @@
       "name":"Villeret",
       "canton":"",
       "domain":"villeret.ch",
-      "mx":[],
-      "spf":"",
-      "provider":"unknown"
+      "mx":[
+        "villeret-ch.mail.protection.outlook.com"
+      ],
+      "spf":"v=spf1 include:spf.protection.outlook.com include:spf.mandrillapp.com -all",
+      "provider":"microsoft"
     },
     "449":{
       "bfs":"449",
@@ -2972,7 +2982,7 @@
       "mx":[
         "mta-gw.infomaniak.ch"
       ],
-      "spf":"",
+      "spf":"v=spf1 include:spf.infomaniak.ch ip4:212.71.120.144/28 -all",
       "provider":"infomaniak"
     },
     "450":{
@@ -2985,7 +2995,7 @@
         "mx2.zline.ch",
         "mx20.zline.ch"
       ],
-      "spf":"",
+      "spf":"v=spf1 ip4:185.48.146.91 ip4:185.48.144.218 include:spf.zline.ch include:spf.infomaniak.ch -all",
       "provider":"sovereign"
     },
     "491":{
@@ -3004,9 +3014,12 @@
       "name":"Erlach",
       "canton":"",
       "domain":"erlach.ch",
-      "mx":[],
-      "spf":"",
-      "provider":"unknown"
+      "mx":[
+        "mail.format-ag.ch",
+        "mail.tankred.ch"
+      ],
+      "spf":"v=spf1 a include:_spf.talus.ch -all",
+      "provider":"sovereign"
     },
     "493":{
       "bfs":"493",
@@ -3036,9 +3049,11 @@
       "name":"Gampelen",
       "canton":"",
       "domain":"gampelen.ch",
-      "mx":[],
-      "spf":"",
-      "provider":"unknown"
+      "mx":[
+        "gampelen-ch.mail.protection.outlook.com"
+      ],
+      "spf":"v=spf1 include:smtprelay.dialogcloud.ch include:spf.protection.outlook.com -all",
+      "provider":"microsoft"
     },
     "496":{
       "bfs":"496",
@@ -3063,7 +3078,7 @@
         "mx1.rufcloud.ch",
         "mx2.rufcloud.ch"
       ],
-      "spf":"",
+      "spf":"v=spf1 mx include:spf.customer.swiss-egov.cloud ip4:88.99.160.53 -all -all",
       "provider":"sovereign"
     },
     "498":{
@@ -3074,7 +3089,7 @@
       "mx":[
         "muentschemier-ch.mail.protection.outlook.com"
       ],
-      "spf":"",
+      "spf":"v=spf1 include:tiberius.sui-inter.net include:spf.protection.outlook.com -all",
       "provider":"microsoft"
     },
     "499":{
@@ -3093,27 +3108,35 @@
       "name":"Treiten",
       "canton":"",
       "domain":"treiten.ch",
-      "mx":[],
-      "spf":"",
-      "provider":"unknown"
+      "mx":[
+        "treiten-ch.mail.protection.outlook.com"
+      ],
+      "spf":"v=spf1 include:smtprelay.dialogcloud.ch include:spf.protection.outlook.com -all",
+      "provider":"microsoft"
     },
     "501":{
       "bfs":"501",
       "name":"Tschugg",
       "canton":"",
       "domain":"tschugg.ch",
-      "mx":[],
-      "spf":"",
-      "provider":"unknown"
+      "mx":[
+        "mx1.rufcloud.ch",
+        "mx2.rufcloud.ch"
+      ],
+      "spf":"v=spf1 mx ip4:88.99.160.53 include:spf.customer.swiss-egov.cloud -all",
+      "provider":"sovereign"
     },
     "502":{
       "bfs":"502",
       "name":"Vinelz",
       "canton":"",
       "domain":"vinelz.ch",
-      "mx":[],
-      "spf":"",
-      "provider":"unknown"
+      "mx":[
+        "mx1.rufcloud.ch",
+        "mx2.rufcloud.ch"
+      ],
+      "spf":"v=spf1 mx include:spf.customer.swiss-egov.cloud ip4:88.99.160.53 -all",
+      "provider":"sovereign"
     },
     "520":{
       "bfs":"520",
@@ -8728,19 +8751,19 @@
       "mx":[
         "fraeschels-ch.mail.protection.outlook.com"
       ],
-      "spf":"",
+      "spf":"v=spf1 include:spf.protection.outlook.com -all",
       "provider":"microsoft"
     },
     "2261":{
       "bfs":"2261",
       "name":"Greng",
       "canton":"Kanton Freiburg",
-      "domain":"netconsult.ch",
+      "domain":"greng.ch",
       "mx":[
-        "mail.netconsult.ch"
+        "greng-ch.mail.protection.outlook.com"
       ],
-      "spf":"",
-      "provider":"sovereign"
+      "spf":"v=spf1 include:smtprelay.dialogcloud.ch include:spf.protection.outlook.com include:spf.sesamnet.ch -all",
+      "provider":"microsoft"
     },
     "2262":{
       "bfs":"2262",
@@ -8839,7 +8862,7 @@
       "mx":[
         "ried-ch.mail.protection.outlook.com"
       ],
-      "spf":"",
+      "spf":"v=spf1 mx a include:spf.protection.outlook.com ~all",
       "provider":"microsoft"
     },
     "2278":{
@@ -8862,7 +8885,7 @@
         "mx1.mail.hostpoint.ch",
         "mx2.mail.hostpoint.ch"
       ],
-      "spf":"",
+      "spf":"v=spf1 redirect=spf-permissive.mail.hostpoint.ch",
       "provider":"sovereign"
     },
     "2284":{
@@ -8883,9 +8906,13 @@
       "name":"Brünisried",
       "canton":"",
       "domain":"bruenisried.ch",
-      "mx":[],
+      "mx":[
+        "mx01.senselan.ch",
+        "mx02.senselan.ch",
+        "mx03.senselan.ch"
+      ],
       "spf":"",
-      "provider":"unknown"
+      "provider":"sovereign"
     },
     "2293":{
       "bfs":"2293",
@@ -8906,7 +8933,7 @@
       "mx":[
         "giffers-ch.mail.protection.outlook.com"
       ],
-      "spf":"",
+      "spf":"v=spf1 include:spf.protection.outlook.com -all",
       "provider":"microsoft"
     },
     "2295":{
@@ -9885,7 +9912,7 @@
       "mx":[
         "bellach-ch.mail.protection.outlook.com"
       ],
-      "spf":"v=spf1 +a +mx +a:mailsrv.dynabyte.ch +ip4:193.135.56.6  include:spf.protection.outlook.com -all",
+      "spf":"v=spf1 +a +mx +a:mailsrv.dynabyte.ch +ip4:193.135.56.6 include:spf.protection.outlook.com -all",
       "provider":"microsoft"
     },
     "2543":{
@@ -12613,7 +12640,7 @@
       "mx":[
         "ebnatkappel-ch01c.mail.protection.outlook.com"
       ],
-      "spf":"",
+      "spf":"v=spf1 a:mail.wattwil.ch include:spf.abxsec.com include:spf.protection.outlook.com ~all",
       "provider":"microsoft"
     },
     "3359":{
@@ -12637,7 +12664,7 @@
         "mta1.abxsec.com",
         "mta2.abxsec.com"
       ],
-      "spf":"",
+      "spf":"v=spf1 mx include:_spf.abxsec.com  include:spf.protection.outlook.com ~all",
       "provider":"sovereign"
     },
     "3372":{
@@ -12668,10 +12695,13 @@
       "bfs":"3375",
       "name":"Oberhelfenschwil",
       "canton":"",
-      "domain":"",
-      "mx":[],
-      "spf":"",
-      "provider":"unknown"
+      "domain":"oberhelfenschwil.ch",
+      "mx":[
+        "mta1.abxsec.com",
+        "mta2.abxsec.com"
+      ],
+      "spf":"v=spf1 mx include:_spf.abxsec.com ~all",
+      "provider":"sovereign"
     },
     "3379":{
       "bfs":"3379",
@@ -12682,7 +12712,7 @@
         "mta1.abxsec.com",
         "mta2.abxsec.com"
       ],
-      "spf":"",
+      "spf":"v=spf1 mx a include:_spf.abxsec.com include:spf.protection.outlook.com include:_spf.i-web.ch include:_spf.ch.seppmail.cloud ~all",
       "provider":"sovereign"
     },
     "3392":{
@@ -12717,7 +12747,7 @@
       "mx":[
         "mosnang-ch.mail.protection.outlook.com"
       ],
-      "spf":"",
+      "spf":"v=spf1 include:spf.abxsec.com include:spf.protection.outlook.com -all",
       "provider":"microsoft"
     },
     "3395":{
@@ -12810,7 +12840,7 @@
         "mta1.abxsec.com",
         "mta2.abxsec.com"
       ],
-      "spf":"",
+      "spf":"v=spf1 a mx include:_spf.abxsec.com include:relay.mailchannels.net include:spf.protection.outlook.com ip4:49.13.125.142 ~all",
       "provider":"sovereign"
     },
     "3423":{
@@ -17076,18 +17106,24 @@
       "name":"Tobel-Tägerschen",
       "canton":"",
       "domain":"tobel-taegerschen.ch",
-      "mx":[],
-      "spf":"",
-      "provider":"unknown"
+      "mx":[
+        "mta1.tg.ch",
+        "mta2.tg.ch"
+      ],
+      "spf":"v=spf1 mx ip4:193.135.56.16 include:spf.escapenet.ch include:egeko.ch -all",
+      "provider":"sovereign"
     },
     "4781":{
       "bfs":"4781",
       "name":"Wängi",
       "canton":"",
       "domain":"waengi.ch",
-      "mx":[],
-      "spf":"",
-      "provider":"unknown"
+      "mx":[
+        "mta1.tg.ch",
+        "mta2.tg.ch"
+      ],
+      "spf":"v=spf1 mx include:tg.ch include:sui-inter.net include:dxb.ch ip4:193.135.56.6 -all",
+      "provider":"sovereign"
     },
     "4786":{
       "bfs":"4786",
@@ -17110,7 +17146,7 @@
         "mx1.rufcloud.ch",
         "mx2.rufcloud.ch"
       ],
-      "spf":"",
+      "spf":"v=spf1 mx include:spf.customer.swiss-egov.cloud include:_spf.i-web.ch ~all",
       "provider":"sovereign"
     },
     "4801":{
@@ -17122,7 +17158,7 @@
         "mta1.tg.ch",
         "mta2.tg.ch"
       ],
-      "spf":"",
+      "spf":"v=spf1 mx ip4:193.135.56.6 include:tg.ch include:spf.abxsec.com -all",
       "provider":"sovereign"
     },
     "4806":{
@@ -17157,7 +17193,7 @@
       "mx":[
         "mail.homburg.ch"
       ],
-      "spf":"",
+      "spf":"v=spf1 mx include:tg.ch",
       "provider":"sovereign"
     },
     "4821":{
@@ -17169,7 +17205,7 @@
         "mx1.rufcloud.ch",
         "mx2.rufcloud.ch"
       ],
-      "spf":"",
+      "spf":"v=spf1 mx include:spf.customer.swiss-egov.cloud include:_spf.i-web.ch include:egeko.ch -all",
       "provider":"sovereign"
     },
     "4826":{
@@ -17240,7 +17276,7 @@
         "mta1.tg.ch",
         "mta2.tg.ch"
       ],
-      "spf":"",
+      "spf":"v=spf1 ip4:193.33.128.155 +a +mx +ip4:193.33.128.141 +include:spf.mandrillapp.com +include:relay.mailchannels.net include:_spf.i-web.ch ~all",
       "provider":"sovereign"
     },
     "4871":{
@@ -20816,7 +20852,7 @@
       "mx":[
         "bavois-ch.mail.protection.outlook.com"
       ],
-      "spf":"",
+      "spf":"v=spf1 include:spf.protection.outlook.com -all",
       "provider":"microsoft"
     },
     "5747":{
@@ -20850,7 +20886,7 @@
       "mx":[
         "chavornay-ch.mail.protection.outlook.com"
       ],
-      "spf":"",
+      "spf":"v=spf1 ip4:194.153.189.8 include:spf.protection.outlook.com include:_spf.i-web.ch include:spf1.ne.ch ~all",
       "provider":"microsoft"
     },
     "5750":{
@@ -20858,9 +20894,11 @@
       "name":"Les Clées",
       "canton":"",
       "domain":"lesclees.ch",
-      "mx":[],
-      "spf":"",
-      "provider":"unknown"
+      "mx":[
+        "mta-gw.infomaniak.ch"
+      ],
+      "spf":"v=spf1 include:spf.infomaniak.ch -all",
+      "provider":"infomaniak"
     },
     "5752":{
       "bfs":"5752",
@@ -20870,7 +20908,7 @@
       "mx":[
         "mta-gw.infomaniak.ch"
       ],
-      "spf":"",
+      "spf":"v=spf1 include:spf.infomaniak.ch ?all",
       "provider":"infomaniak"
     },
     "5754":{
@@ -20903,7 +20941,7 @@
       "mx":[
         "mta-gw.infomaniak.ch"
       ],
-      "spf":"",
+      "spf":"v=spf1 include:spf.infomaniak.ch ip4:212.71.120.144/28 -all",
       "provider":"infomaniak"
     },
     "5757":{
@@ -20914,7 +20952,7 @@
       "mx":[
         "orbe-ch.mail.protection.outlook.com"
       ],
-      "spf":"",
+      "spf":"v=spf1 +a +mx +include:relay.mailchannels.net +include:spf.ganesh-hosting.ch +include:spf.protection.outlook.com -all",
       "provider":"microsoft"
     },
     "5758":{
@@ -20947,28 +20985,30 @@
       "mx":[
         "rances-ch.mail.protection.outlook.com"
       ],
-      "spf":"",
+      "spf":"v=spf1 include:spf.protection.outlook.com include:spf.infomaniak.ch -all",
       "provider":"microsoft"
     },
     "5761":{
       "bfs":"5761",
       "name":"Romainmôtier-Envy",
       "canton":"",
-      "domain":"romainmotier-envy.ch",
+      "domain":"romainmotier.ch",
       "mx":[
-        "romainmotierenvy-ch03b.mail.protection.outlook.com"
+        "mta-gw.infomaniak.ch"
       ],
-      "spf":"v=spf1 include:spf.protection.outlook.com ip4:212.71.120.144/28 -all",
-      "provider":"microsoft"
+      "spf":"v=spf1 include:spf.infomaniak.ch ?all",
+      "provider":"infomaniak"
     },
     "5762":{
       "bfs":"5762",
       "name":"Sergey",
       "canton":"",
       "domain":"sergey.ch",
-      "mx":[],
-      "spf":"",
-      "provider":"unknown"
+      "mx":[
+        "mta-gw.infomaniak.ch"
+      ],
+      "spf":"v=spf1 include:spf.infomaniak.ch include:_spf.webforge.ch ?all",
+      "provider":"infomaniak"
     },
     "5763":{
       "bfs":"5763",

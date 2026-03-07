@@ -1,16 +1,19 @@
 import asyncio
-from itertools import cycle
+import logging
 
 import dns.asyncresolver
 import dns.exception
 import dns.resolver
 
-_resolver_pool = None
-_pool_lock = None
+logger = logging.getLogger(__name__)
+
+_resolvers = None
+
+_RETRYABLE = (dns.exception.Timeout, dns.resolver.NoAnswer, dns.resolver.NoNameservers)
 
 
-def make_resolver_pool():
-    """Create a pool of async resolvers pointing to different DNS servers."""
+def make_resolvers():
+    """Create a list of async resolvers pointing to different DNS servers."""
     resolvers = []
     for nameservers in [None, ["8.8.8.8", "8.8.4.4"], ["1.1.1.1", "1.0.0.1"]]:
         r = dns.asyncresolver.Resolver()
@@ -19,42 +22,39 @@ def make_resolver_pool():
         r.timeout = 10
         r.lifetime = 15
         resolvers.append(r)
-    return cycle(resolvers)
+    return resolvers
 
 
-async def get_resolver():
-    global _resolver_pool, _pool_lock
-    if _pool_lock is None:
-        _pool_lock = asyncio.Lock()
-    if _resolver_pool is None:
-        _resolver_pool = make_resolver_pool()
-    async with _pool_lock:
-        return next(_resolver_pool)
+def get_resolvers():
+    global _resolvers
+    if _resolvers is None:
+        _resolvers = make_resolvers()
+    return _resolvers
 
 
 async def lookup_mx(domain):
     """Return list of MX exchange hostnames."""
-    resolver = await get_resolver()
-    for attempt in range(2):
+    resolvers = get_resolvers()
+    for i, resolver in enumerate(resolvers):
         try:
             answers = await resolver.resolve(domain, 'MX')
             return sorted(str(r.exchange).rstrip('.').lower() for r in answers)
-        except dns.exception.Timeout:
-            if attempt == 0:
-                await asyncio.sleep(1)
-                resolver = await get_resolver()
-                continue
+        except dns.resolver.NXDOMAIN:
             return []
-        except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer, dns.resolver.NoNameservers):
-            return []
+        except _RETRYABLE as e:
+            logger.debug("MX %s: %s on resolver %d, retrying", domain, type(e).__name__, i)
+            await asyncio.sleep(0.5)
+            continue
         except Exception:
-            return []
+            continue
+    logger.info("MX %s: all resolvers failed", domain)
+    return []
 
 
 async def lookup_spf(domain):
     """Return the SPF TXT record if found."""
-    resolver = await get_resolver()
-    for attempt in range(2):
+    resolvers = get_resolvers()
+    for i, resolver in enumerate(resolvers):
         try:
             answers = await resolver.resolve(domain, 'TXT')
             spf_records = []
@@ -65,11 +65,13 @@ async def lookup_spf(domain):
             if spf_records:
                 return sorted(spf_records)[0]
             return ""
-        except dns.exception.Timeout:
-            if attempt == 0:
-                await asyncio.sleep(1)
-                resolver = await get_resolver()
-                continue
+        except dns.resolver.NXDOMAIN:
             return ""
+        except _RETRYABLE as e:
+            logger.debug("SPF %s: %s on resolver %d, retrying", domain, type(e).__name__, i)
+            await asyncio.sleep(0.5)
+            continue
         except Exception:
-            return ""
+            continue
+    logger.info("SPF %s: all resolvers failed", domain)
+    return ""

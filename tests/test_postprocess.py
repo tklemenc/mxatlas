@@ -192,6 +192,62 @@ class TestScrapeEmailDomainsNoEmails:
         assert result == set()
 
 
+class TestDnsRetryStep:
+    async def test_recovers_unknown_with_domain(self, tmp_path):
+        data = {
+            "generated": "2025-01-01",
+            "total": 1,
+            "counts": {"unknown": 1},
+            "municipalities": {
+                "1234": {
+                    "bfs": "1234",
+                    "name": "Gampelen",
+                    "canton": "Bern",
+                    "domain": "gampelen.ch",
+                    "mx": [],
+                    "spf": "",
+                    "provider": "unknown",
+                },
+            },
+        }
+        path = tmp_path / "data.json"
+        path.write_text(json.dumps(data))
+
+        with patch("mail_sovereignty.postprocess.lookup_mx", new_callable=AsyncMock,
+                    return_value=["gampelen-ch.mail.protection.outlook.com"]), \
+             patch("mail_sovereignty.postprocess.lookup_spf", new_callable=AsyncMock,
+                    return_value="v=spf1 include:spf.protection.outlook.com -all"):
+            await run(path)
+
+        result = json.loads(path.read_text())
+        assert result["municipalities"]["1234"]["provider"] == "microsoft"
+
+    async def test_skips_unknown_without_domain(self, tmp_path):
+        data = {
+            "generated": "2025-01-01",
+            "total": 1,
+            "counts": {"unknown": 1},
+            "municipalities": {
+                "9999": {
+                    "bfs": "9999",
+                    "name": "NoDomain",
+                    "canton": "Test",
+                    "domain": "",
+                    "mx": [],
+                    "spf": "",
+                    "provider": "unknown",
+                },
+            },
+        }
+        path = tmp_path / "data.json"
+        path.write_text(json.dumps(data))
+
+        await run(path)
+
+        result = json.loads(path.read_text())
+        assert result["municipalities"]["9999"]["provider"] == "unknown"
+
+
 class TestPostprocessRun:
     async def test_applies_manual_overrides(self, tmp_path):
         data = {

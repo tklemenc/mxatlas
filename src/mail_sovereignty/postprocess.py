@@ -214,7 +214,21 @@ async def run(data_path: Path):
             muni[bfs]["provider"] = provider
             print(f"  {bfs:>5} {muni[bfs]['name']:<30} -> {provider} (DNS re-lookup)")
 
-    # Step 2: Scrape remaining unknowns
+    # Step 2: Retry DNS for unknowns that have a domain
+    dns_retry_candidates = [m for m in muni.values() if m["provider"] == "unknown" and m.get("domain")]
+    if dns_retry_candidates:
+        print(f"\nRetrying DNS for {len(dns_retry_candidates)} unknown domains...")
+        for m in dns_retry_candidates:
+            mx = await lookup_mx(m["domain"])
+            if mx:
+                spf = await lookup_spf(m["domain"])
+                provider = classify(mx, spf)
+                m["mx"] = mx
+                m["spf"] = spf
+                m["provider"] = provider
+                print(f"  RECOVERED {m['bfs']:>5} {m['name']:<30} -> {provider}")
+
+    # Step 3: Scrape remaining unknowns
     unknowns = [m for m in muni.values() if m["provider"] == "unknown"]
     print(f"\n{len(unknowns)} unknown municipalities to investigate\n")
 
