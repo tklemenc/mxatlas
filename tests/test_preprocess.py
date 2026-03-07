@@ -2,7 +2,6 @@ import json
 from unittest.mock import AsyncMock, patch
 
 import httpx
-import pytest
 import respx
 
 from mail_sovereignty.preprocess import (
@@ -15,6 +14,7 @@ from mail_sovereignty.preprocess import (
 
 
 # ── url_to_domain() ─────────────────────────────────────────────────
+
 
 class TestUrlToDomain:
     def test_full_url_with_path(self):
@@ -40,6 +40,7 @@ class TestUrlToDomain:
 
 
 # ── guess_domains() ─────────────────────────────────────────────────
+
 
 class TestGuessDomains:
     def test_simple_name(self):
@@ -71,22 +72,26 @@ class TestGuessDomains:
 
 # ── fetch_wikidata() ─────────────────────────────────────────────────
 
+
 class TestFetchWikidata:
     @respx.mock
     async def test_success(self):
         respx.post("https://query.wikidata.org/sparql").mock(
-            return_value=httpx.Response(200, json={
-                "results": {
-                    "bindings": [
-                        {
-                            "bfs": {"value": "351"},
-                            "itemLabel": {"value": "Bern"},
-                            "website": {"value": "https://www.bern.ch"},
-                            "cantonLabel": {"value": "Bern"},
-                        },
-                    ]
-                }
-            })
+            return_value=httpx.Response(
+                200,
+                json={
+                    "results": {
+                        "bindings": [
+                            {
+                                "bfs": {"value": "351"},
+                                "itemLabel": {"value": "Bern"},
+                                "website": {"value": "https://www.bern.ch"},
+                                "cantonLabel": {"value": "Bern"},
+                            },
+                        ]
+                    }
+                },
+            )
         )
 
         result = await fetch_wikidata()
@@ -96,24 +101,27 @@ class TestFetchWikidata:
     @respx.mock
     async def test_deduplication(self):
         respx.post("https://query.wikidata.org/sparql").mock(
-            return_value=httpx.Response(200, json={
-                "results": {
-                    "bindings": [
-                        {
-                            "bfs": {"value": "351"},
-                            "itemLabel": {"value": "Bern"},
-                            "website": {"value": "https://www.bern.ch"},
-                            "cantonLabel": {"value": "Bern"},
-                        },
-                        {
-                            "bfs": {"value": "351"},
-                            "itemLabel": {"value": "Bern"},
-                            "website": {"value": "https://www.bern.ch/alt"},
-                            "cantonLabel": {"value": "Bern"},
-                        },
-                    ]
-                }
-            })
+            return_value=httpx.Response(
+                200,
+                json={
+                    "results": {
+                        "bindings": [
+                            {
+                                "bfs": {"value": "351"},
+                                "itemLabel": {"value": "Bern"},
+                                "website": {"value": "https://www.bern.ch"},
+                                "cantonLabel": {"value": "Bern"},
+                            },
+                            {
+                                "bfs": {"value": "351"},
+                                "itemLabel": {"value": "Bern"},
+                                "website": {"value": "https://www.bern.ch/alt"},
+                                "cantonLabel": {"value": "Bern"},
+                            },
+                        ]
+                    }
+                },
+            )
         )
 
         result = await fetch_wikidata()
@@ -122,13 +130,29 @@ class TestFetchWikidata:
 
 # ── scan_municipality() ──────────────────────────────────────────────
 
+
 class TestScanMunicipality:
     async def test_website_domain_mx_found(self):
-        m = {"bfs": "351", "name": "Bern", "canton": "Bern", "website": "https://www.bern.ch"}
+        m = {
+            "bfs": "351",
+            "name": "Bern",
+            "canton": "Bern",
+            "website": "https://www.bern.ch",
+        }
         sem = __import__("asyncio").Semaphore(10)
 
-        with patch("mail_sovereignty.preprocess.lookup_mx", new_callable=AsyncMock, return_value=["mail.protection.outlook.com"]), \
-             patch("mail_sovereignty.preprocess.lookup_spf", new_callable=AsyncMock, return_value="v=spf1 include:spf.protection.outlook.com -all"):
+        with (
+            patch(
+                "mail_sovereignty.preprocess.lookup_mx",
+                new_callable=AsyncMock,
+                return_value=["mail.protection.outlook.com"],
+            ),
+            patch(
+                "mail_sovereignty.preprocess.lookup_spf",
+                new_callable=AsyncMock,
+                return_value="v=spf1 include:spf.protection.outlook.com -all",
+            ),
+        ):
             result = await scan_municipality(m, sem)
 
         assert result["provider"] == "microsoft"
@@ -143,8 +167,14 @@ class TestScanMunicipality:
                 return ["mail.bern.ch"]
             return []
 
-        with patch("mail_sovereignty.preprocess.lookup_mx", side_effect=fake_lookup_mx), \
-             patch("mail_sovereignty.preprocess.lookup_spf", new_callable=AsyncMock, return_value=""):
+        with (
+            patch("mail_sovereignty.preprocess.lookup_mx", side_effect=fake_lookup_mx),
+            patch(
+                "mail_sovereignty.preprocess.lookup_spf",
+                new_callable=AsyncMock,
+                return_value="",
+            ),
+        ):
             result = await scan_municipality(m, sem)
 
         assert result["provider"] == "sovereign"
@@ -154,8 +184,18 @@ class TestScanMunicipality:
         m = {"bfs": "999", "name": "Zzz", "canton": "Test", "website": ""}
         sem = __import__("asyncio").Semaphore(10)
 
-        with patch("mail_sovereignty.preprocess.lookup_mx", new_callable=AsyncMock, return_value=[]), \
-             patch("mail_sovereignty.preprocess.lookup_spf", new_callable=AsyncMock, return_value=""):
+        with (
+            patch(
+                "mail_sovereignty.preprocess.lookup_mx",
+                new_callable=AsyncMock,
+                return_value=[],
+            ),
+            patch(
+                "mail_sovereignty.preprocess.lookup_spf",
+                new_callable=AsyncMock,
+                return_value="",
+            ),
+        ):
             result = await scan_municipality(m, sem)
 
         assert result["provider"] == "unknown"
@@ -163,26 +203,40 @@ class TestScanMunicipality:
 
 # ── run() ────────────────────────────────────────────────────────────
 
+
 class TestPreprocessRun:
     @respx.mock
     async def test_writes_output(self, tmp_path):
         respx.post("https://query.wikidata.org/sparql").mock(
-            return_value=httpx.Response(200, json={
-                "results": {
-                    "bindings": [
-                        {
-                            "bfs": {"value": "351"},
-                            "itemLabel": {"value": "Bern"},
-                            "website": {"value": "https://www.bern.ch"},
-                            "cantonLabel": {"value": "Bern"},
-                        },
-                    ]
-                }
-            })
+            return_value=httpx.Response(
+                200,
+                json={
+                    "results": {
+                        "bindings": [
+                            {
+                                "bfs": {"value": "351"},
+                                "itemLabel": {"value": "Bern"},
+                                "website": {"value": "https://www.bern.ch"},
+                                "cantonLabel": {"value": "Bern"},
+                            },
+                        ]
+                    }
+                },
+            )
         )
 
-        with patch("mail_sovereignty.preprocess.lookup_mx", new_callable=AsyncMock, return_value=["mx.bern.ch"]), \
-             patch("mail_sovereignty.preprocess.lookup_spf", new_callable=AsyncMock, return_value=""):
+        with (
+            patch(
+                "mail_sovereignty.preprocess.lookup_mx",
+                new_callable=AsyncMock,
+                return_value=["mx.bern.ch"],
+            ),
+            patch(
+                "mail_sovereignty.preprocess.lookup_spf",
+                new_callable=AsyncMock,
+                return_value="",
+            ),
+        ):
             output = tmp_path / "data.json"
             await run(output)
 

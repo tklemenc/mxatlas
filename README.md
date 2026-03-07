@@ -37,6 +37,10 @@ uv sync --group dev
 
 # Run tests with coverage
 uv run pytest --cov --cov-report=term-missing
+
+# Lint the codebase
+uv run ruff check src tests
+uv run ruff format src tests
 ```
 
 

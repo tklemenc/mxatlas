@@ -1,17 +1,27 @@
-import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import dns.exception
 import dns.resolver
 import pytest
 
-from mail_sovereignty.dns import get_resolvers, lookup_a, lookup_asn_cymru, lookup_cname_chain, lookup_mx, lookup_spf, make_resolvers, resolve_mx_asns, resolve_mx_cnames
+from mail_sovereignty.dns import (
+    get_resolvers,
+    lookup_a,
+    lookup_asn_cymru,
+    lookup_cname_chain,
+    lookup_mx,
+    lookup_spf,
+    make_resolvers,
+    resolve_mx_asns,
+    resolve_mx_cnames,
+)
 
 
 @pytest.fixture(autouse=True)
 def reset_dns_globals():
     """Reset module-level globals before each test."""
     import mail_sovereignty.dns as dns_mod
+
     dns_mod._resolvers = None
 
 
@@ -30,6 +40,7 @@ class TestMakeResolvers:
 class TestGetResolvers:
     def test_lazy_init(self):
         import mail_sovereignty.dns as dns_mod
+
         assert dns_mod._resolvers is None
 
         with patch("mail_sovereignty.dns.make_resolvers") as mock:
@@ -40,6 +51,7 @@ class TestGetResolvers:
 
     def test_cached(self):
         import mail_sovereignty.dns as dns_mod
+
         dns_mod._resolvers = ["cached"]
         assert get_resolvers() == ["cached"]
 
@@ -64,7 +76,10 @@ class TestLookupMx:
         mock_resolver2 = AsyncMock()
         mock_resolver2.resolve = AsyncMock(return_value=[])
 
-        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver, mock_resolver2]):
+        with patch(
+            "mail_sovereignty.dns.get_resolvers",
+            return_value=[mock_resolver, mock_resolver2],
+        ):
             result = await lookup_mx("nonexistent.ch")
         assert result == []
         # NXDOMAIN is terminal — second resolver should NOT be called
@@ -81,7 +96,10 @@ class TestLookupMx:
         mock_resolver2 = AsyncMock()
         mock_resolver2.resolve = AsyncMock(return_value=mock_answer)
 
-        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver1, mock_resolver2]):
+        with patch(
+            "mail_sovereignty.dns.get_resolvers",
+            return_value=[mock_resolver1, mock_resolver2],
+        ):
             with patch("asyncio.sleep", new_callable=AsyncMock):
                 result = await lookup_mx("example.ch")
         assert result == ["mail.example.ch"]
@@ -97,7 +115,10 @@ class TestLookupMx:
         mock_resolver2 = AsyncMock()
         mock_resolver2.resolve = AsyncMock(return_value=mock_answer)
 
-        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver1, mock_resolver2]):
+        with patch(
+            "mail_sovereignty.dns.get_resolvers",
+            return_value=[mock_resolver1, mock_resolver2],
+        ):
             with patch("asyncio.sleep", new_callable=AsyncMock):
                 result = await lookup_mx("example.ch")
         assert result == ["mail.example.ch"]
@@ -113,7 +134,10 @@ class TestLookupMx:
         mock_resolver2 = AsyncMock()
         mock_resolver2.resolve = AsyncMock(return_value=mock_answer)
 
-        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver1, mock_resolver2]):
+        with patch(
+            "mail_sovereignty.dns.get_resolvers",
+            return_value=[mock_resolver1, mock_resolver2],
+        ):
             with patch("asyncio.sleep", new_callable=AsyncMock):
                 result = await lookup_mx("example.ch")
         assert result == ["mail.example.ch"]
@@ -141,7 +165,10 @@ class TestLookupMx:
         mock_resolver2 = AsyncMock()
         mock_resolver2.resolve = AsyncMock(return_value=mock_answer)
 
-        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver1, mock_resolver2]):
+        with patch(
+            "mail_sovereignty.dns.get_resolvers",
+            return_value=[mock_resolver1, mock_resolver2],
+        ):
             result = await lookup_mx("example.ch")
         assert result == ["mail.example.ch"]
 
@@ -165,7 +192,10 @@ class TestLookupSpf:
 
         mock_resolver2 = AsyncMock()
 
-        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver, mock_resolver2]):
+        with patch(
+            "mail_sovereignty.dns.get_resolvers",
+            return_value=[mock_resolver, mock_resolver2],
+        ):
             result = await lookup_spf("nonexistent.ch")
         assert result == ""
         mock_resolver2.resolve.assert_not_called()
@@ -181,7 +211,10 @@ class TestLookupSpf:
         mock_resolver2 = AsyncMock()
         mock_resolver2.resolve = AsyncMock(return_value=mock_answer)
 
-        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver1, mock_resolver2]):
+        with patch(
+            "mail_sovereignty.dns.get_resolvers",
+            return_value=[mock_resolver1, mock_resolver2],
+        ):
             with patch("asyncio.sleep", new_callable=AsyncMock):
                 result = await lookup_spf("example.ch")
         assert result == "v=spf1 include:example.ch -all"
@@ -209,7 +242,10 @@ class TestLookupSpf:
         mock_resolver2 = AsyncMock()
         mock_resolver2.resolve = AsyncMock(return_value=mock_answer)
 
-        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver1, mock_resolver2]):
+        with patch(
+            "mail_sovereignty.dns.get_resolvers",
+            return_value=[mock_resolver1, mock_resolver2],
+        ):
             result = await lookup_spf("example.ch")
         assert result == "v=spf1 include:example.ch -all"
 
@@ -293,7 +329,10 @@ class TestLookupCnameChain:
             ]
         )
 
-        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver1, mock_resolver2]):
+        with patch(
+            "mail_sovereignty.dns.get_resolvers",
+            return_value=[mock_resolver1, mock_resolver2],
+        ):
             with patch("asyncio.sleep", new_callable=AsyncMock):
                 result = await lookup_cname_chain("mail.example.ch")
         assert result == ["mail.protection.outlook.com"]
@@ -370,7 +409,10 @@ class TestLookupA:
         mock_resolver2 = AsyncMock()
         mock_resolver2.resolve = AsyncMock(return_value=["1.2.3.4"])
 
-        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver1, mock_resolver2]):
+        with patch(
+            "mail_sovereignty.dns.get_resolvers",
+            return_value=[mock_resolver1, mock_resolver2],
+        ):
             with patch("asyncio.sleep", new_callable=AsyncMock):
                 result = await lookup_a("example.ch")
         assert result == ["1.2.3.4"]
@@ -422,7 +464,10 @@ class TestLookupAsnCymru:
         mock_resolver2 = AsyncMock()
         mock_resolver2.resolve = AsyncMock(return_value=[mock_rr])
 
-        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver1, mock_resolver2]):
+        with patch(
+            "mail_sovereignty.dns.get_resolvers",
+            return_value=[mock_resolver1, mock_resolver2],
+        ):
             with patch("asyncio.sleep", new_callable=AsyncMock):
                 result = await lookup_asn_cymru("77.109.128.1")
         assert result == 13030
@@ -442,8 +487,12 @@ class TestLookupAsnCymru:
 
 class TestResolveMxAsns:
     async def test_returns_asn_set(self):
-        with patch("mail_sovereignty.dns.lookup_a", new_callable=AsyncMock) as mock_a, \
-             patch("mail_sovereignty.dns.lookup_asn_cymru", new_callable=AsyncMock) as mock_asn:
+        with (
+            patch("mail_sovereignty.dns.lookup_a", new_callable=AsyncMock) as mock_a,
+            patch(
+                "mail_sovereignty.dns.lookup_asn_cymru", new_callable=AsyncMock
+            ) as mock_asn,
+        ):
             mock_a.return_value = ["193.135.252.10"]
             mock_asn.return_value = 3303
 
@@ -451,8 +500,12 @@ class TestResolveMxAsns:
         assert result == {3303}
 
     async def test_multiple_hosts_dedup(self):
-        with patch("mail_sovereignty.dns.lookup_a", new_callable=AsyncMock) as mock_a, \
-             patch("mail_sovereignty.dns.lookup_asn_cymru", new_callable=AsyncMock) as mock_asn:
+        with (
+            patch("mail_sovereignty.dns.lookup_a", new_callable=AsyncMock) as mock_a,
+            patch(
+                "mail_sovereignty.dns.lookup_asn_cymru", new_callable=AsyncMock
+            ) as mock_asn,
+        ):
             mock_a.return_value = ["193.135.252.10"]
             mock_asn.return_value = 3303
 
@@ -467,8 +520,12 @@ class TestResolveMxAsns:
         assert result == set()
 
     async def test_asn_lookup_failure_skipped(self):
-        with patch("mail_sovereignty.dns.lookup_a", new_callable=AsyncMock) as mock_a, \
-             patch("mail_sovereignty.dns.lookup_asn_cymru", new_callable=AsyncMock) as mock_asn:
+        with (
+            patch("mail_sovereignty.dns.lookup_a", new_callable=AsyncMock) as mock_a,
+            patch(
+                "mail_sovereignty.dns.lookup_asn_cymru", new_callable=AsyncMock
+            ) as mock_asn,
+        ):
             mock_a.return_value = ["1.2.3.4"]
             mock_asn.return_value = None
 

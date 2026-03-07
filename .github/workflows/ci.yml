@@ -14,4 +14,6 @@ jobs:
       - uses: astral-sh/setup-uv@v7
       - run: uv python install 3.13
       - run: uv sync --group dev
+      - run: uv run ruff check src tests
+      - run: uv run ruff format src tests --check
       - run: uv run pytest --cov --cov-report=term-missing

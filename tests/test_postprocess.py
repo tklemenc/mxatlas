@@ -2,8 +2,6 @@ import asyncio
 import json
 from unittest.mock import AsyncMock, patch
 
-import pytest
-
 from mail_sovereignty.postprocess import (
     MANUAL_OVERRIDES,
     build_urls,
@@ -16,6 +14,7 @@ from mail_sovereignty.postprocess import (
 
 
 # ── decrypt_typo3() ──────────────────────────────────────────────────
+
 
 class TestDecryptTypo3:
     def test_known_encrypted(self):
@@ -42,6 +41,7 @@ class TestDecryptTypo3:
 
 
 # ── extract_email_domains() ──────────────────────────────────────────
+
 
 class TestExtractEmailDomains:
     def test_plain_email(self):
@@ -76,6 +76,7 @@ class TestExtractEmailDomains:
 
 # ── build_urls() ─────────────────────────────────────────────────────
 
+
 class TestBuildUrls:
     def test_bare_domain(self):
         urls = build_urls("example.ch")
@@ -100,6 +101,7 @@ class TestBuildUrls:
 
 # ── MANUAL_OVERRIDES ─────────────────────────────────────────────────
 
+
 class TestManualOverrides:
     def test_all_entries_have_required_keys(self):
         for bfs, entry in MANUAL_OVERRIDES.items():
@@ -109,10 +111,13 @@ class TestManualOverrides:
     def test_valid_providers(self):
         valid = {"sovereign", "infomaniak", "merged"}
         for bfs, entry in MANUAL_OVERRIDES.items():
-            assert entry["provider"] in valid, f"BFS {bfs}: unexpected provider {entry['provider']}"
+            assert entry["provider"] in valid, (
+                f"BFS {bfs}: unexpected provider {entry['provider']}"
+            )
 
 
 # ── Async functions ──────────────────────────────────────────────────
+
 
 class TestScrapeEmailDomains:
     async def test_empty_domain(self):
@@ -151,8 +156,18 @@ class TestProcessUnknown:
         client = AsyncMock()
         client.get = AsyncMock(return_value=FakeResponse())
 
-        with patch("mail_sovereignty.postprocess.lookup_mx", new_callable=AsyncMock, return_value=["mail.test.ch"]), \
-             patch("mail_sovereignty.postprocess.lookup_spf", new_callable=AsyncMock, return_value=""):
+        with (
+            patch(
+                "mail_sovereignty.postprocess.lookup_mx",
+                new_callable=AsyncMock,
+                return_value=["mail.test.ch"],
+            ),
+            patch(
+                "mail_sovereignty.postprocess.lookup_spf",
+                new_callable=AsyncMock,
+                return_value="",
+            ),
+        ):
             result = await process_unknown(client, sem, m)
 
         assert result["provider"] == "sovereign"
@@ -213,10 +228,18 @@ class TestDnsRetryStep:
         path = tmp_path / "data.json"
         path.write_text(json.dumps(data))
 
-        with patch("mail_sovereignty.postprocess.lookup_mx", new_callable=AsyncMock,
-                    return_value=["gampelen-ch.mail.protection.outlook.com"]), \
-             patch("mail_sovereignty.postprocess.lookup_spf", new_callable=AsyncMock,
-                    return_value="v=spf1 include:spf.protection.outlook.com -all"):
+        with (
+            patch(
+                "mail_sovereignty.postprocess.lookup_mx",
+                new_callable=AsyncMock,
+                return_value=["gampelen-ch.mail.protection.outlook.com"],
+            ),
+            patch(
+                "mail_sovereignty.postprocess.lookup_spf",
+                new_callable=AsyncMock,
+                return_value="v=spf1 include:spf.protection.outlook.com -all",
+            ),
+        ):
             await run(path)
 
         result = json.loads(path.read_text())

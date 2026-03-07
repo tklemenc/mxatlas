@@ -7,6 +7,7 @@ from mail_sovereignty.validate import print_report, run, score_entry
 
 # ── score_entry() ────────────────────────────────────────────────────
 
+
 class TestScoreEntry:
     def test_merged(self):
         result = score_entry({"provider": "merged"})
@@ -14,162 +15,209 @@ class TestScoreEntry:
         assert "merged_municipality" in result["flags"]
 
     def test_full_microsoft(self):
-        result = score_entry({
-            "provider": "microsoft",
-            "domain": "bern.ch",
-            "mx": ["bern-ch.mail.protection.outlook.com"],
-            "spf": "v=spf1 include:spf.protection.outlook.com -all",
-            "bfs": "351",
-        })
+        result = score_entry(
+            {
+                "provider": "microsoft",
+                "domain": "bern.ch",
+                "mx": ["bern-ch.mail.protection.outlook.com"],
+                "spf": "v=spf1 include:spf.protection.outlook.com -all",
+                "bfs": "351",
+            }
+        )
         assert result["score"] == 90
         assert "mx_spf_match" in result["flags"]
         assert "spf_strict" in result["flags"]
 
     def test_sovereign_with_matching_spf(self):
-        result = score_entry({
-            "provider": "sovereign",
-            "domain": "ne.ch",
-            "mx": ["nemx9a.ne.ch"],
-            "spf": "v=spf1 include:spf1.ne.ch ~all",
-            "bfs": "9000",
-        })
+        result = score_entry(
+            {
+                "provider": "sovereign",
+                "domain": "ne.ch",
+                "mx": ["nemx9a.ne.ch"],
+                "spf": "v=spf1 include:spf1.ne.ch ~all",
+                "bfs": "9000",
+            }
+        )
         assert result["score"] >= 70
         assert "mx_spf_match" in result["flags"]
 
     def test_sovereign_mx_with_cloud_spf(self):
-        result = score_entry({
-            "provider": "sovereign",
-            "domain": "ne.ch",
-            "mx": ["nemx9a.ne.ch"],
-            "spf": "v=spf1 include:spf.protection.outlook.com ~all",
-            "bfs": "9000",
-        })
+        result = score_entry(
+            {
+                "provider": "sovereign",
+                "domain": "ne.ch",
+                "mx": ["nemx9a.ne.ch"],
+                "spf": "v=spf1 include:spf.protection.outlook.com ~all",
+                "bfs": "9000",
+            }
+        )
         assert "sovereign_mx_with_cloud_spf" in result["flags"]
 
     def test_mx_spf_mismatch(self):
-        result = score_entry({
-            "provider": "microsoft",
-            "domain": "test.ch",
-            "mx": ["mail.protection.outlook.com"],
-            "spf": "v=spf1 include:_spf.google.com -all",
-            "bfs": "9000",
-        })
+        result = score_entry(
+            {
+                "provider": "microsoft",
+                "domain": "test.ch",
+                "mx": ["mail.protection.outlook.com"],
+                "spf": "v=spf1 include:_spf.google.com -all",
+                "bfs": "9000",
+            }
+        )
         assert "mx_spf_mismatch" in result["flags"]
 
     def test_no_domain(self):
-        result = score_entry({
-            "provider": "unknown",
-            "domain": "",
-            "mx": [],
-            "spf": "",
-            "bfs": "9000",
-        })
+        result = score_entry(
+            {
+                "provider": "unknown",
+                "domain": "",
+                "mx": [],
+                "spf": "",
+                "bfs": "9000",
+            }
+        )
         assert "no_domain" in result["flags"]
 
     def test_no_mx(self):
-        result = score_entry({
-            "provider": "unknown",
-            "domain": "test.ch",
-            "mx": [],
-            "spf": "",
-            "bfs": "9000",
-        })
+        result = score_entry(
+            {
+                "provider": "unknown",
+                "domain": "test.ch",
+                "mx": [],
+                "spf": "",
+                "bfs": "9000",
+            }
+        )
         assert "no_mx" in result["flags"]
 
     def test_no_spf(self):
-        result = score_entry({
-            "provider": "sovereign",
-            "domain": "test.ch",
-            "mx": ["mail.test.ch"],
-            "spf": "",
-            "bfs": "9000",
-        })
+        result = score_entry(
+            {
+                "provider": "sovereign",
+                "domain": "test.ch",
+                "mx": ["mail.test.ch"],
+                "spf": "",
+                "bfs": "9000",
+            }
+        )
         assert "no_spf" in result["flags"]
 
     def test_multiple_mx(self):
-        result = score_entry({
-            "provider": "sovereign",
-            "domain": "test.ch",
-            "mx": ["mx1.test.ch", "mx2.test.ch"],
-            "spf": "",
-            "bfs": "9000",
-        })
+        result = score_entry(
+            {
+                "provider": "sovereign",
+                "domain": "test.ch",
+                "mx": ["mx1.test.ch", "mx2.test.ch"],
+                "spf": "",
+                "bfs": "9000",
+            }
+        )
         assert "multiple_mx" in result["flags"]
 
     def test_spf_strict(self):
-        result = score_entry({
-            "provider": "microsoft",
-            "domain": "test.ch",
-            "mx": ["mail.protection.outlook.com"],
-            "spf": "v=spf1 include:spf.protection.outlook.com -all",
-            "bfs": "9000",
-        })
+        result = score_entry(
+            {
+                "provider": "microsoft",
+                "domain": "test.ch",
+                "mx": ["mail.protection.outlook.com"],
+                "spf": "v=spf1 include:spf.protection.outlook.com -all",
+                "bfs": "9000",
+            }
+        )
         assert "spf_strict" in result["flags"]
 
     def test_spf_softfail(self):
-        result = score_entry({
-            "provider": "microsoft",
-            "domain": "test.ch",
-            "mx": ["mail.protection.outlook.com"],
-            "spf": "v=spf1 include:spf.protection.outlook.com ~all",
-            "bfs": "9000",
-        })
+        result = score_entry(
+            {
+                "provider": "microsoft",
+                "domain": "test.ch",
+                "mx": ["mail.protection.outlook.com"],
+                "spf": "v=spf1 include:spf.protection.outlook.com ~all",
+                "bfs": "9000",
+            }
+        )
         assert "spf_softfail" in result["flags"]
 
     def test_multi_provider_spf(self):
-        result = score_entry({
-            "provider": "microsoft",
-            "domain": "test.ch",
-            "mx": ["mail.protection.outlook.com"],
-            "spf": "v=spf1 include:spf.protection.outlook.com include:_spf.google.com -all",
-            "bfs": "9000",
-        })
+        result = score_entry(
+            {
+                "provider": "microsoft",
+                "domain": "test.ch",
+                "mx": ["mail.protection.outlook.com"],
+                "spf": "v=spf1 include:spf.protection.outlook.com include:_spf.google.com -all",
+                "bfs": "9000",
+            }
+        )
         assert any(f.startswith("multi_provider_spf:") for f in result["flags"])
 
     def test_classified_via_spf_only(self):
-        result = score_entry({
-            "provider": "microsoft",
-            "domain": "test.ch",
-            "mx": [],
-            "spf": "v=spf1 include:spf.protection.outlook.com -all",
-            "bfs": "9000",
-        })
+        result = score_entry(
+            {
+                "provider": "microsoft",
+                "domain": "test.ch",
+                "mx": [],
+                "spf": "v=spf1 include:spf.protection.outlook.com -all",
+                "bfs": "9000",
+            }
+        )
         assert "classified_via_spf_only" in result["flags"]
 
     def test_manual_override(self):
-        result = score_entry({
-            "provider": "sovereign",
-            "domain": "ne.ch",
-            "mx": ["nemx9a.ne.ch"],
-            "spf": "v=spf1 include:spf1.ne.ch ~all",
-            "bfs": "6404",
-        })
+        result = score_entry(
+            {
+                "provider": "sovereign",
+                "domain": "ne.ch",
+                "mx": ["nemx9a.ne.ch"],
+                "spf": "v=spf1 include:spf1.ne.ch ~all",
+                "bfs": "6404",
+            }
+        )
         assert "manual_override" in result["flags"]
 
     def test_unknown_capped_at_25(self):
-        result = score_entry({
-            "provider": "unknown",
-            "domain": "test.ch",
-            "mx": [],
-            "spf": "",
-            "bfs": "9000",
-        })
+        result = score_entry(
+            {
+                "provider": "unknown",
+                "domain": "test.ch",
+                "mx": [],
+                "spf": "",
+                "bfs": "9000",
+            }
+        )
         assert result["score"] <= 25
 
 
 # ── print_report() ───────────────────────────────────────────────────
 
+
 class TestPrintReport:
     def test_runs_without_error(self, capsys):
         entries = [
-            {"bfs": "1", "name": "A", "provider": "microsoft", "score": 90, "flags": ["mx_spf_match"]},
-            {"bfs": "2", "name": "B", "provider": "sovereign", "score": 70, "flags": ["no_spf"]},
+            {
+                "bfs": "1",
+                "name": "A",
+                "provider": "microsoft",
+                "score": 90,
+                "flags": ["mx_spf_match"],
+            },
+            {
+                "bfs": "2",
+                "name": "B",
+                "provider": "sovereign",
+                "score": 70,
+                "flags": ["no_spf"],
+            },
         ]
         print_report(entries)
 
     def test_output_contains_header(self, capsys):
         entries = [
-            {"bfs": "1", "name": "A", "provider": "microsoft", "score": 90, "flags": ["mx_spf_match"]},
+            {
+                "bfs": "1",
+                "name": "A",
+                "provider": "microsoft",
+                "score": 90,
+                "flags": ["mx_spf_match"],
+            },
         ]
         print_report(entries)
         captured = capsys.readouterr()
@@ -177,6 +225,7 @@ class TestPrintReport:
 
 
 # ── run() ────────────────────────────────────────────────────────────
+
 
 class TestRun:
     def test_missing_data_json(self, tmp_path):
@@ -210,38 +259,50 @@ class TestRun:
         captured = capsys.readouterr()
         assert "VALIDATION REPORT" in captured.out
 
-    def test_returns_true_when_quality_passes(self, sample_data_json, tmp_path, monkeypatch):
+    def test_returns_true_when_quality_passes(
+        self, sample_data_json, tmp_path, monkeypatch
+    ):
         monkeypatch.setattr("mail_sovereignty.validate.MIN_AVERAGE_SCORE", 10)
         monkeypatch.setattr("mail_sovereignty.validate.MIN_HIGH_CONFIDENCE_PCT", 10)
         result = run(sample_data_json, tmp_path)
         assert result is True
 
-    def test_returns_false_when_average_below_threshold(self, sample_data_json, tmp_path, monkeypatch):
+    def test_returns_false_when_average_below_threshold(
+        self, sample_data_json, tmp_path, monkeypatch
+    ):
         monkeypatch.setattr("mail_sovereignty.validate.MIN_AVERAGE_SCORE", 99)
         monkeypatch.setattr("mail_sovereignty.validate.MIN_HIGH_CONFIDENCE_PCT", 10)
         result = run(sample_data_json, tmp_path)
         assert result is False
 
-    def test_returns_false_when_high_confidence_below_threshold(self, sample_data_json, tmp_path, monkeypatch):
+    def test_returns_false_when_high_confidence_below_threshold(
+        self, sample_data_json, tmp_path, monkeypatch
+    ):
         monkeypatch.setattr("mail_sovereignty.validate.MIN_AVERAGE_SCORE", 10)
         monkeypatch.setattr("mail_sovereignty.validate.MIN_HIGH_CONFIDENCE_PCT", 100)
         result = run(sample_data_json, tmp_path)
         assert result is False
 
-    def test_exits_nonzero_with_quality_gate(self, sample_data_json, tmp_path, monkeypatch):
+    def test_exits_nonzero_with_quality_gate(
+        self, sample_data_json, tmp_path, monkeypatch
+    ):
         monkeypatch.setattr("mail_sovereignty.validate.MIN_AVERAGE_SCORE", 99)
         monkeypatch.setattr("mail_sovereignty.validate.MIN_HIGH_CONFIDENCE_PCT", 10)
         with pytest.raises(SystemExit) as exc_info:
             run(sample_data_json, tmp_path, quality_gate=True)
         assert exc_info.value.code == 1
 
-    def test_no_exit_without_quality_gate(self, sample_data_json, tmp_path, monkeypatch):
+    def test_no_exit_without_quality_gate(
+        self, sample_data_json, tmp_path, monkeypatch
+    ):
         monkeypatch.setattr("mail_sovereignty.validate.MIN_AVERAGE_SCORE", 99)
         monkeypatch.setattr("mail_sovereignty.validate.MIN_HIGH_CONFIDENCE_PCT", 10)
         result = run(sample_data_json, tmp_path, quality_gate=False)
         assert result is False
 
-    def test_report_includes_quality_fields(self, sample_data_json, tmp_path, monkeypatch):
+    def test_report_includes_quality_fields(
+        self, sample_data_json, tmp_path, monkeypatch
+    ):
         monkeypatch.setattr("mail_sovereignty.validate.MIN_AVERAGE_SCORE", 10)
         monkeypatch.setattr("mail_sovereignty.validate.MIN_HIGH_CONFIDENCE_PCT", 10)
         run(sample_data_json, tmp_path)
