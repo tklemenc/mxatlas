@@ -182,6 +182,14 @@ class TestSpfMentionsProviders:
         )
         assert result == {"microsoft", "mailchimp"}
 
+    def test_detects_smtp2go(self):
+        result = spf_mentions_providers("v=spf1 include:spf.smtp2go.com -all")
+        assert "smtp2go" in result
+
+    def test_detects_nl2go(self):
+        result = spf_mentions_providers("v=spf1 include:spf.nl2go.com -all")
+        assert "nl2go" in result
+
     def test_foreign_sender_not_in_classify(self):
         assert classify([], "v=spf1 include:spf.mandrillapp.com -all") == "unknown"
 

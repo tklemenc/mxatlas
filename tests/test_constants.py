@@ -24,6 +24,11 @@ def test_foreign_sender_keywords_non_empty():
     assert FOREIGN_SENDER_KEYWORDS
     assert "mailchimp" in FOREIGN_SENDER_KEYWORDS
     assert "sendgrid" in FOREIGN_SENDER_KEYWORDS
+    assert "smtp2go" in FOREIGN_SENDER_KEYWORDS
+    assert "nl2go" in FOREIGN_SENDER_KEYWORDS
+    assert "hubspot" in FOREIGN_SENDER_KEYWORDS
+    assert "knowbe4" in FOREIGN_SENDER_KEYWORDS
+    assert "hornetsecurity" in FOREIGN_SENDER_KEYWORDS
     assert set(FOREIGN_SENDER_KEYWORDS.keys()).isdisjoint(set(PROVIDER_KEYWORDS.keys()))
 
 

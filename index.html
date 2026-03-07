@@ -114,8 +114,9 @@
     font-size: 10px; font-weight: 600; line-height: 1.6;
   }
   .cat-badge.hyperscaler { background: #fee2e2; color: #dc2626; }
-  .cat-badge.domestic { background: #dcfce7; color: #16a34a; }
+  .cat-badge.swiss { background: #dcfce7; color: #16a34a; }
   .cat-badge.foreign { background: #fef3c7; color: #b45309; }
+  .cat-badge.unknown { background: #f3f4f6; color: #6b7280; }
   .legend-group { margin-top: 8px; }
   .legend-group:first-child { margin-top: 4px; }
   .legend-group-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.3px; font-weight: 600; display: block; margin-bottom: 2px; }
@@ -185,14 +186,17 @@ const LABELS = {
 
 function classifyHost(host) {
   const h = host.toLowerCase();
+  // Hyperscalers
   if (['mail.protection.outlook.com','outlook.com','microsoft','office365','onmicrosoft','spf.protection.outlook.com','sharepointonline'].some(k => h.includes(k)))
     return { name: 'Microsoft', category: 'hyperscaler' };
   if (['google','googlemail','gmail','aspmx.l.google.com','_spf.google.com'].some(k => h.includes(k)))
     return { name: 'Google', category: 'hyperscaler' };
   if (['amazonaws','amazonses','awsdns'].some(k => h.includes(k)))
     return { name: 'AWS', category: 'hyperscaler' };
+  // Swiss (explicit)
   if (['infomaniak','mxpool.infomaniak'].some(k => h.includes(k)))
-    return { name: 'Infomaniak', category: 'domestic' };
+    return { name: 'Infomaniak', category: 'swiss' };
+  // Foreign senders
   if (['mandrillapp.com','mandrill','mcsv.net'].some(k => h.includes(k)))
     return { name: 'Mailchimp', category: 'foreign' };
   if (h.includes('sendgrid'))
@@ -205,9 +209,51 @@ function classifyHost(host) {
     return { name: 'Brevo', category: 'foreign' };
   if (h.includes('mailchannels'))
     return { name: 'MailChannels', category: 'foreign' };
+  if (h.includes('smtp2go'))
+    return { name: 'SMTP2GO', category: 'foreign' };
+  if (h.includes('nl2go'))
+    return { name: 'Newsletter2Go', category: 'foreign' };
+  if (h.includes('hubspotemail'))
+    return { name: 'HubSpot', category: 'foreign' };
+  if (h.includes('knowbe4'))
+    return { name: 'KnowBe4', category: 'foreign' };
+  if (['sophos','sophosxl'].some(k => h.includes(k)))
+    return { name: 'Sophos', category: 'foreign' };
+  if (h.includes('trendmicro'))
+    return { name: 'Trend Micro', category: 'foreign' };
+  if (['hornetsecurity','hornetdmarc'].some(k => h.includes(k)))
+    return { name: 'Hornetsecurity', category: 'foreign' };
+  if (h.includes('barracudanetworks'))
+    return { name: 'Barracuda', category: 'foreign' };
+  if (h.includes('mlsend'))
+    return { name: 'MailerLite', category: 'foreign' };
+  if (h.includes('createsend'))
+    return { name: 'Campaign Monitor', category: 'foreign' };
+  if (h.includes('exclaimer'))
+    return { name: 'Exclaimer', category: 'foreign' };
+  if (h.includes('turbo-smtp'))
+    return { name: 'turboSMTP', category: 'foreign' };
+  if (h.includes('letsignit'))
+    return { name: 'Letsignit', category: 'foreign' };
+  if (h.includes('codetwo'))
+    return { name: 'CodeTwo', category: 'foreign' };
+  if (h.includes('freshservice'))
+    return { name: 'Freshservice', category: 'foreign' };
+  // Known Swiss providers with non-.ch TLDs
+  const SWISS_DOMAINS = [
+    'abxsec.com','swiss-egov.cloud','sui-inter.net','ch-dns.net','cyon.net',
+    'seppmail.cloud','swisscom.com','privasphere.com','tinext.com','cloudrexx.com',
+    'mailomat.cloud','comp-sys.net','engadin.cloud','ti-informatique.com',
+    'assolo.net','moresi.com'
+  ];
+  if (SWISS_DOMAINS.some(d => h.endsWith(d) || h.endsWith('.' + d)))
+    return { name: h.replace(/^_/, '').split('.').slice(-2).join('.'), category: 'swiss' };
+  // TLD-based fallback
   const parts = host.replace(/^_/, '').split('.');
   const name = parts.length >= 2 ? parts.slice(-2).join('.') : host;
-  return { name, category: 'domestic' };
+  if (h.endsWith('.ch') || h.endsWith('.swiss'))
+    return { name, category: 'swiss' };
+  return { name, category: 'unknown' };
 }
 
 function parseSpfDelegations(spf) {

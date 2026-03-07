@@ -33,6 +33,11 @@ FOREIGN_SENDER_KEYWORDS = {
     "mailgun": ["mailgun"],
     "brevo": ["sendinblue", "brevo"],
     "mailchannels": ["mailchannels"],
+    "smtp2go": ["smtp2go"],
+    "nl2go": ["nl2go"],
+    "hubspot": ["hubspotemail"],
+    "knowbe4": ["knowbe4"],
+    "hornetsecurity": ["hornetsecurity", "hornetdmarc"],
 }
 
 SPARQL_URL = "https://query.wikidata.org/sparql"
