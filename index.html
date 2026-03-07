@@ -156,8 +156,8 @@ const COLORS = {
 const LABELS = {
   microsoft:  'Microsoft 365',
   google:     'Google Workspace',
-  infomaniak: 'Infomaniak',
   aws:        'Amazon Web Services',
+  infomaniak: 'Infomaniak',
   sovereign:  'Sovereign / Self-hosted',
   merged:     'Merged municipality',
   unknown:    'Unknown'
@@ -171,7 +171,7 @@ function classifyHost(host) {
     return { name: 'Google', category: 'hyperscaler' };
   if (['amazonaws','amazonses','awsdns'].some(k => h.includes(k)))
     return { name: 'AWS', category: 'hyperscaler' };
-  if (['infomaniak','ik2.com','mxpool.infomaniak'].some(k => h.includes(k)))
+  if (['infomaniak','mxpool.infomaniak'].some(k => h.includes(k)))
     return { name: 'Infomaniak', category: 'domestic' };
   const parts = host.replace(/^_/, '').split('.');
   const name = parts.length >= 2 ? parts.slice(-2).join('.') : host;

@@ -1,5 +1,5 @@
 {
-  "generated":"2026-03-07T13:01:03Z",
+  "generated":"2026-03-07T13:24:03Z",
   "total":2171,
   "counts":{
     "aws":27,
@@ -1018,7 +1018,7 @@
       "mx":[
         "wetzikon-ch.mail.protection.outlook.com"
       ],
-      "spf":"v=spf1 mx include:spf.protection.outlook.com mx:hin.ch include:_spf.abxsec.com a:mail.i-web.ch include:_spf.talus.ch include:spf3.wetzikon.ch include:spf4.wetzikon.ch -all",
+      "spf":"",
       "provider":"microsoft"
     },
     "131":{
@@ -1109,7 +1109,7 @@
       "mx":[
         "erlenbach-ch.mail.protection.outlook.com"
       ],
-      "spf":"v=spf1 include:spf.protection.outlook.com include:spf.protection.cyon.net include:_spf.abxsec.com -all",
+      "spf":"",
       "provider":"microsoft"
     },
     "152":{
@@ -1145,7 +1145,7 @@
         "mta1.abxsec.com",
         "mta2.abxsec.com"
       ],
-      "spf":"v=spf1 mx include:spf.abxsec.com ip4:193.135.56.0/24 ip4:193.135.57.0/24 ip4:193.135.58.0/24 include:servers.mcsv.net ip4:193.246.64.0/19 a:mail01.refline.ch a:mail02.refline.ch ip4:212.80.96.0/21 ip6:2a01:7480:1:100::/64 -all",
+      "spf":"",
       "provider":"sovereign"
     },
     "155":{
@@ -2254,7 +2254,7 @@
       "mx":[
         "bern-ch.mail.protection.outlook.com"
       ],
-      "spf":"v=spf1 a mx ip4:193.247.33.1/32 ip4:193.247.33.3/32 ip4:193.247.35.27/32 ip4:92.42.184.212/32 ip4:92.42.184.216/32 ip4:138.188.166.160/27 include:spf.protection.outlook.com -all",
+      "spf":"",
       "provider":"microsoft"
     },
     "352":{
@@ -7578,7 +7578,7 @@
         "mail1.zg.ch",
         "mail2.zg.ch"
       ],
-      "spf":"v=spf1 mx ip6:2a10:8244:1000:1800::5001/128 ip6:2a10:8244:1000:1800::5002/128 ip6:2a10:8244:4:600::/64 ip4:159.144.81.1 ip4:159.144.81.2 ip4:193.134.14.50/32 include:spf.secemail.ch include:spf.protection.outlook.com include:spf.privasphere.com -all",
+      "spf":"",
       "provider":"sovereign"
     },
     "1704":{
@@ -7590,7 +7590,7 @@
         "mail1.zg.ch",
         "mail2.zg.ch"
       ],
-      "spf":"v=spf1 mx ip6:2a10:8244:1000:1800::5001/128 ip6:2a10:8244:1000:1800::5002/128 ip6:2a10:8244:4:600::/64 ip4:159.144.81.1 ip4:159.144.81.2 ip4:193.134.14.50/32 include:spf.secemail.ch include:spf.protection.outlook.com include:spf.privasphere.com -all",
+      "spf":"",
       "provider":"sovereign"
     },
     "1705":{
@@ -8818,7 +8818,11 @@
         "mail2.merlach.ch"
       ],
       "spf":"v=spf1 mx a:mail.asp.ruf.ch a:mx1.rufcloud.ch a:mx2.rufcloud.ch -all",
-      "provider":"sovereign"
+      "provider":"sovereign",
+      "mx_cnames":{
+        "mail.merlach.ch":"mx1.rufcloud.ch",
+        "mail2.merlach.ch":"mx2.rufcloud.ch"
+      }
     },
     "2272":{
       "bfs":"2272",
@@ -9864,7 +9868,7 @@
         "mx1.rufcloud.ch",
         "mx2.rufcloud.ch"
       ],
-      "spf":"v=spf1 mx a:mail.asp.ruf.ch a:mx1.rufcloud.ch a:mx2.rufcloud.ch a:webcms.ruf.ch include:spf.cloudrexx.com  -all",
+      "spf":"v=SPF1 mx include:spf.customer.swiss-egov.cloud a:webcms.ruf.ch include:spf.cloudrexx.com -all",
       "provider":"sovereign"
     },
     "2534":{
@@ -10776,7 +10780,7 @@
       "mx":[
         "bubendorf-swiss.mail.protection.outlook.com"
       ],
-      "spf":"v=spf1 include:_spf.talus.ch include:spf.protection.outlook.com -all",
+      "spf":"",
       "provider":"microsoft"
     },
     "2824":{
@@ -14188,7 +14192,10 @@
         "mail.kuettigen.ch"
       ],
       "spf":"v=spf1 a mx include:spf.lanpool.ch -all",
-      "provider":"sovereign"
+      "provider":"sovereign",
+      "mx_cnames":{
+        "mail.kuettigen.ch":"uplink.kuettigen.lanpool.net"
+      }
     },
     "4009":{
       "bfs":"4009",
@@ -24491,7 +24498,10 @@
         "mail.montfaucon.ch"
       ],
       "spf":"v=spf1 ip4:5.182.248.186 include:spf.infomaniak.ch include:tizoo.com ip4:5.182.248.144 +a +mx +ip4:212.147.66.228 a:mail.montfaucon.ch a:mtfn.montfaucon.ch a:beesolutions.ch ~all",
-      "provider":"sovereign"
+      "provider":"sovereign",
+      "mx_cnames":{
+        "mail.montfaucon.ch":"mtfn-nas1.i234.me"
+      }
     },
     "6752":{
       "bfs":"6752",

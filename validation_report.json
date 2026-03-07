@@ -1,6 +1,6 @@
 {
   "total": 2171,
-  "average_score": 87.9,
+  "average_score": 87.8,
   "entries": {
     "1": {
       "name": "Aeugst am Albis",
@@ -990,10 +990,9 @@
       "name": "Wetzikon",
       "provider": "microsoft",
       "domain": "wetzikon.ch",
-      "confidence": 90,
+      "confidence": 50,
       "flags": [
-        "spf_strict",
-        "mx_spf_match",
+        "no_spf",
         "provider_classified"
       ]
     },
@@ -1081,10 +1080,9 @@
       "name": "Erlenbach",
       "provider": "microsoft",
       "domain": "erlenbach.ch",
-      "confidence": 90,
+      "confidence": 50,
       "flags": [
-        "spf_strict",
-        "mx_spf_match",
+        "no_spf",
         "provider_classified"
       ]
     },
@@ -1116,11 +1114,10 @@
       "name": "Küsnacht",
       "provider": "sovereign",
       "domain": "kuesnacht.ch",
-      "confidence": 95,
+      "confidence": 55,
       "flags": [
         "multiple_mx",
-        "spf_strict",
-        "mx_spf_match",
+        "no_spf",
         "provider_classified"
       ]
     },
@@ -2200,10 +2197,9 @@
       "name": "Bern",
       "provider": "microsoft",
       "domain": "bern.ch",
-      "confidence": 90,
+      "confidence": 50,
       "flags": [
-        "spf_strict",
-        "mx_spf_match",
+        "no_spf",
         "provider_classified"
       ]
     },
@@ -7388,11 +7384,10 @@
       "name": "Hünenberg",
       "provider": "sovereign",
       "domain": "zg.ch",
-      "confidence": 85,
+      "confidence": 55,
       "flags": [
         "multiple_mx",
-        "spf_strict",
-        "sovereign_mx_with_cloud_spf",
+        "no_spf",
         "provider_classified"
       ]
     },
@@ -7400,11 +7395,10 @@
       "name": "Menzingen",
       "provider": "sovereign",
       "domain": "zg.ch",
-      "confidence": 85,
+      "confidence": 55,
       "flags": [
         "multiple_mx",
-        "spf_strict",
-        "sovereign_mx_with_cloud_spf",
+        "no_spf",
         "provider_classified"
       ]
     },
@@ -10558,10 +10552,9 @@
       "name": "Bubendorf",
       "provider": "microsoft",
       "domain": "bubendorf.swiss",
-      "confidence": 90,
+      "confidence": 50,
       "flags": [
-        "spf_strict",
-        "mx_spf_match",
+        "no_spf",
         "provider_classified"
       ]
     },

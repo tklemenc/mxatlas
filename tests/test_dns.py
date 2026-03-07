@@ -5,7 +5,7 @@ import dns.exception
 import dns.resolver
 import pytest
 
-from mail_sovereignty.dns import get_resolvers, lookup_mx, lookup_spf, make_resolvers
+from mail_sovereignty.dns import get_resolvers, lookup_cname_chain, lookup_mx, lookup_spf, make_resolvers, resolve_mx_cnames
 
 
 @pytest.fixture(autouse=True)
@@ -224,3 +224,123 @@ class TestLookupSpf:
         with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver]):
             result = await lookup_spf("example.ch")
         assert result == ""
+
+
+class TestLookupCnameChain:
+    async def test_single_cname(self):
+        mock_rr = MagicMock()
+        mock_rr.target = "mail.protection.outlook.com."
+
+        mock_resolver = AsyncMock()
+        mock_resolver.resolve = AsyncMock(
+            side_effect=[
+                [mock_rr],  # first call returns CNAME
+                dns.resolver.NoAnswer(),  # second call: no more CNAMEs
+            ]
+        )
+
+        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver]):
+            result = await lookup_cname_chain("mail.example.ch")
+        assert result == ["mail.protection.outlook.com"]
+
+    async def test_no_cname(self):
+        mock_resolver = AsyncMock()
+        mock_resolver.resolve = AsyncMock(side_effect=dns.resolver.NoAnswer())
+
+        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver]):
+            result = await lookup_cname_chain("mail.example.ch")
+        assert result == []
+
+    async def test_chain_of_two(self):
+        mock_rr1 = MagicMock()
+        mock_rr1.target = "intermediate.example.com."
+        mock_rr2 = MagicMock()
+        mock_rr2.target = "mail.protection.outlook.com."
+
+        mock_resolver = AsyncMock()
+        mock_resolver.resolve = AsyncMock(
+            side_effect=[
+                [mock_rr1],
+                [mock_rr2],
+                dns.resolver.NoAnswer(),
+            ]
+        )
+
+        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver]):
+            result = await lookup_cname_chain("mail.example.ch")
+        assert result == ["intermediate.example.com", "mail.protection.outlook.com"]
+
+    async def test_nxdomain_stops_chain(self):
+        mock_resolver = AsyncMock()
+        mock_resolver.resolve = AsyncMock(side_effect=dns.resolver.NXDOMAIN())
+
+        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver]):
+            result = await lookup_cname_chain("mail.example.ch")
+        assert result == []
+
+    async def test_timeout_retries_next_resolver(self):
+        mock_rr = MagicMock()
+        mock_rr.target = "mail.protection.outlook.com."
+
+        mock_resolver1 = AsyncMock()
+        mock_resolver1.resolve = AsyncMock(side_effect=dns.exception.Timeout())
+
+        mock_resolver2 = AsyncMock()
+        mock_resolver2.resolve = AsyncMock(
+            side_effect=[
+                [mock_rr],
+                dns.resolver.NoAnswer(),
+            ]
+        )
+
+        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver1, mock_resolver2]):
+            with patch("asyncio.sleep", new_callable=AsyncMock):
+                result = await lookup_cname_chain("mail.example.ch")
+        assert result == ["mail.protection.outlook.com"]
+
+
+class TestResolveMxCnames:
+    async def test_returns_mapping(self):
+        mock_rr = MagicMock()
+        mock_rr.target = "mail.protection.outlook.com."
+
+        mock_resolver = AsyncMock()
+        mock_resolver.resolve = AsyncMock(
+            side_effect=[
+                [mock_rr],
+                dns.resolver.NoAnswer(),
+            ]
+        )
+
+        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver]):
+            result = await resolve_mx_cnames(["mail.example.ch"])
+        assert result == {"mail.example.ch": "mail.protection.outlook.com"}
+
+    async def test_no_cnames_returns_empty(self):
+        mock_resolver = AsyncMock()
+        mock_resolver.resolve = AsyncMock(side_effect=dns.resolver.NoAnswer())
+
+        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver]):
+            result = await resolve_mx_cnames(["mail.example.ch"])
+        assert result == {}
+
+    async def test_mixed_hosts(self):
+        """One host has a CNAME, another doesn't."""
+        mock_rr = MagicMock()
+        mock_rr.target = "mail.protection.outlook.com."
+
+        call_count = 0
+
+        async def side_effect(hostname, rdtype):
+            nonlocal call_count
+            call_count += 1
+            if hostname == "mail.example.ch" and call_count == 1:
+                return [mock_rr]
+            raise dns.resolver.NoAnswer()
+
+        mock_resolver = AsyncMock()
+        mock_resolver.resolve = AsyncMock(side_effect=side_effect)
+
+        with patch("mail_sovereignty.dns.get_resolvers", return_value=[mock_resolver]):
+            result = await resolve_mx_cnames(["mail.example.ch", "mail2.example.ch"])
+        assert result == {"mail.example.ch": "mail.protection.outlook.com"}

@@ -14,7 +14,7 @@ from mail_sovereignty.constants import (
     SUBPAGES,
     TYPO3_RE,
 )
-from mail_sovereignty.dns import lookup_mx, lookup_spf
+from mail_sovereignty.dns import lookup_mx, lookup_spf, resolve_mx_cnames
 
 
 def decrypt_typo3(encoded: str, offset: int = 2) -> str:
@@ -130,13 +130,16 @@ async def process_unknown(client: httpx.AsyncClient, semaphore: asyncio.Semaphor
             mx = await lookup_mx(email_domain)
             if mx:
                 spf = await lookup_spf(email_domain)
-                provider = classify(mx, spf)
+                mx_cnames = await resolve_mx_cnames(mx)
+                provider = classify(mx, spf, mx_cnames=mx_cnames)
                 print(f"  RESOLVED {bfs:>5} {name:<30} "
                       f"email_domain={email_domain} -> {provider}")
                 m["mx"] = mx
                 m["spf"] = spf
                 m["provider"] = provider
                 m["domain"] = email_domain
+                if mx_cnames:
+                    m["mx_cnames"] = mx_cnames
                 return m
 
         print(f"  UNKNOWN  {bfs:>5} {name:<30} "
@@ -205,14 +208,17 @@ async def run(data_path: Path) -> None:
         async def _relookup(bfs, domain):
             mx = await lookup_mx(domain)
             spf = await lookup_spf(domain)
-            provider = classify(mx, spf)
-            return bfs, mx, spf, provider
+            mx_cnames = await resolve_mx_cnames(mx) if mx else {}
+            provider = classify(mx, spf, mx_cnames=mx_cnames)
+            return bfs, mx, spf, mx_cnames, provider
 
         results = await asyncio.gather(*[_relookup(b, d) for b, d in dns_relookup])
-        for bfs, mx, spf, provider in results:
+        for bfs, mx, spf, mx_cnames, provider in results:
             muni[bfs]["mx"] = mx
             muni[bfs]["spf"] = spf
             muni[bfs]["provider"] = provider
+            if mx_cnames:
+                muni[bfs]["mx_cnames"] = mx_cnames
             print(f"  {bfs:>5} {muni[bfs]['name']:<30} -> {provider} (DNS re-lookup)")
 
     # Step 2: Retry DNS for unknowns that have a domain
@@ -223,10 +229,13 @@ async def run(data_path: Path) -> None:
             mx = await lookup_mx(m["domain"])
             if mx:
                 spf = await lookup_spf(m["domain"])
-                provider = classify(mx, spf)
+                mx_cnames = await resolve_mx_cnames(mx)
+                provider = classify(mx, spf, mx_cnames=mx_cnames)
                 m["mx"] = mx
                 m["spf"] = spf
                 m["provider"] = provider
+                if mx_cnames:
+                    m["mx_cnames"] = mx_cnames
                 print(f"  RECOVERED {m['bfs']:>5} {m['name']:<30} -> {provider}")
 
     # Step 3: Scrape remaining unknowns

@@ -37,6 +37,28 @@ class TestClassify:
         )
         assert result == "sovereign"
 
+    def test_cname_detects_microsoft(self):
+        result = classify(
+            ["mail.example.ch"],
+            "",
+            mx_cnames={"mail.example.ch": "mail.protection.outlook.com"},
+        )
+        assert result == "microsoft"
+
+    def test_cname_none_stays_sovereign(self):
+        assert classify(["mail.example.ch"], "", mx_cnames=None) == "sovereign"
+
+    def test_cname_empty_stays_sovereign(self):
+        assert classify(["mail.example.ch"], "", mx_cnames={}) == "sovereign"
+
+    def test_direct_mx_takes_precedence_over_cname(self):
+        result = classify(
+            ["mail.protection.outlook.com"],
+            "",
+            mx_cnames={"mail.protection.outlook.com": "something.else.com"},
+        )
+        assert result == "microsoft"
+
 
 # ── classify_from_mx() ──────────────────────────────────────────────
 

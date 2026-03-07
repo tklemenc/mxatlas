@@ -75,3 +75,43 @@ async def lookup_spf(domain: str) -> str:
             continue
     logger.info("SPF %s: all resolvers failed", domain)
     return ""
+
+
+async def lookup_cname_chain(hostname: str, max_hops: int = 10) -> list[str]:
+    """Follow CNAME chain for hostname. Return list of targets (empty if no CNAME)."""
+    resolvers = get_resolvers()
+    chain = []
+    current = hostname
+
+    for _ in range(max_hops):
+        resolved = False
+        for i, resolver in enumerate(resolvers):
+            try:
+                answers = await resolver.resolve(current, 'CNAME')
+                target = str(list(answers)[0].target).rstrip('.').lower()
+                chain.append(target)
+                current = target
+                resolved = True
+                break
+            except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
+                break
+            except _RETRYABLE as e:
+                logger.debug("CNAME %s: %s on resolver %d, retrying", current, type(e).__name__, i)
+                await asyncio.sleep(0.5)
+                continue
+            except Exception:
+                continue
+        if not resolved:
+            break
+
+    return chain
+
+
+async def resolve_mx_cnames(mx_hosts: list[str]) -> dict[str, str]:
+    """For each MX host, follow CNAME chain. Return mapping of host -> final target (only for hosts with CNAMEs)."""
+    result = {}
+    for host in mx_hosts:
+        chain = await lookup_cname_chain(host)
+        if chain:
+            result[host] = chain[-1]
+    return result

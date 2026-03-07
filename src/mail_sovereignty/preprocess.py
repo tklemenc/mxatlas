@@ -10,7 +10,7 @@ import httpx
 
 from mail_sovereignty.classify import classify
 from mail_sovereignty.constants import CONCURRENCY, SPARQL_QUERY, SPARQL_URL
-from mail_sovereignty.dns import lookup_mx, lookup_spf
+from mail_sovereignty.dns import lookup_mx, lookup_spf, resolve_mx_cnames
 
 
 def url_to_domain(url: str | None) -> str | None:
@@ -111,9 +111,10 @@ async def scan_municipality(m: dict[str, str], semaphore: asyncio.Semaphore) -> 
                     spf = await lookup_spf(guess)
                     break
 
-        provider = classify(mx, spf)
+        mx_cnames = await resolve_mx_cnames(mx) if mx else {}
+        provider = classify(mx, spf, mx_cnames=mx_cnames)
 
-        return {
+        entry: dict[str, Any] = {
             "bfs": m["bfs"],
             "name": m["name"],
             "canton": m.get("canton", ""),
@@ -122,6 +123,9 @@ async def scan_municipality(m: dict[str, str], semaphore: asyncio.Semaphore) -> 
             "spf": spf,
             "provider": provider,
         }
+        if mx_cnames:
+            entry["mx_cnames"] = mx_cnames
+        return entry
 
 
 async def run(output_path: Path) -> None:

@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from mail_sovereignty.classify import classify_from_mx, classify_from_spf, spf_mentions_providers
+from mail_sovereignty.constants import PROVIDER_KEYWORDS
 
 MANUAL_OVERRIDE_BFS = {
     "6404", "6408", "6413", "6416", "6417", "6432", "6433", "6434",
@@ -94,6 +95,20 @@ def score_entry(entry: dict[str, Any]) -> dict[str, Any]:
         flags.append("provider_classified")
     else:
         flags.append("provider_unknown")
+
+    # Provider detected via CNAME resolution
+    mx_cnames = entry.get("mx_cnames", {})
+    if mx_cnames:
+        mx_blob = ' '.join(mx).lower()
+        cname_blob = ' '.join(mx_cnames.values()).lower()
+        mx_matches_provider = any(
+            any(k in mx_blob for k in kws) for kws in PROVIDER_KEYWORDS.values()
+        )
+        cname_matches_provider = any(
+            any(k in cname_blob for k in kws) for kws in PROVIDER_KEYWORDS.values()
+        )
+        if not mx_matches_provider and cname_matches_provider:
+            flags.append("provider_via_cname")
 
     # Manual override (+5)
     if bfs in MANUAL_OVERRIDE_BFS:
