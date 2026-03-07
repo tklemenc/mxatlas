@@ -302,12 +302,12 @@ async function loadData() {
   };
   legend.addTo(map);
 
-  // Render lakes as a distinct blue layer
+  // Render lakes as a distinct layer
   if (topo.objects.lakes) {
     const lakes = topojson.feature(topo, topo.objects.lakes);
     L.geoJSON(lakes, {
       interactive: false,
-      style: { fillColor: '#a4d6ea', fillOpacity: 1, weight: 0, color: 'transparent' }
+      style: { fillColor: '#697985', fillOpacity: 1, weight: 0, color: 'transparent' }
     }).addTo(map);
   }
 
