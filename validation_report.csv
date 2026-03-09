@@ -1,5 +1,4 @@
 bfs,name,provider,domain,confidence,flags
-6172,Bister VS,unknown,,0,no_domain; no_mx; no_spf; provider_unknown
 715,Rebévelier,unknown,,0,no_domain; no_mx; no_spf; provider_unknown
 709,Seehof BE,unknown,,0,no_domain; no_mx; no_spf; provider_unknown
 422,Rüti bei Lyssach,infomaniak,ruetibeilyssach.ch,30,no_mx; no_spf; provider_classified; manual_override
@@ -247,6 +246,7 @@ bfs,name,provider,domain,confidence,flags
 6790,Fontenais,sovereign,fontenais.ch,85,multiple_mx; spf_strict; sovereign_mx_with_cloud_spf; provider_classified
 5717,Founex,microsoft,founex.ch,85,spf_strict; mx_spf_match; multi_provider_spf:infomaniak+microsoft; provider_classified; autodiscover_confirms
 4566,Frauenfeld,swiss-isp,frauenfeld.ch,85,mx_spf_match; provider_classified
+2056,Fétigny-Ménières,microsoft,fetigny-menieres.ch,85,spf_strict; mx_spf_match; multi_provider_spf:infomaniak+microsoft; provider_classified; autodiscover_confirms
 4029,Gebenstorf,sovereign,gebenstorf.ch,85,multiple_mx; spf_strict; sovereign_mx_with_cloud_spf; provider_classified
 5720,Givrins,microsoft,givrins.ch,85,spf_strict; mx_spf_match; multi_provider_spf:infomaniak+microsoft; provider_classified; autodiscover_confirms
 5721,Gland,microsoft,gland.ch,85,spf_strict; mx_spf_match; multi_provider_spf:infomaniak+microsoft; provider_classified; autodiscover_confirms
@@ -1072,6 +1072,7 @@ bfs,name,provider,domain,confidence,flags
 2766,Birsfelden,sovereign,birsfelden.ch,95,multiple_mx; spf_strict; mx_spf_match; provider_classified
 4471,Bischofszell,microsoft,bischofszell.ch,95,spf_strict; mx_spf_match; provider_classified; autodiscover_confirms
 5154,Bissone,microsoft,bissone.ch,95,spf_strict; mx_spf_match; provider_classified; autodiscover_confirms
+6172,Bister VS,microsoft,gemeinde-bister.ch,95,spf_strict; mx_spf_match; provider_classified; autodiscover_confirms
 6173,Bitsch,microsoft,bitsch.ch,95,spf_strict; mx_spf_match; provider_classified; autodiscover_confirms
 6192,Blatten,microsoft,blatten-vs.ch,95,spf_strict; mx_spf_match; provider_classified; autodiscover_confirms
 2781,Blauen,microsoft,blauen.ch,95,spf_strict; mx_spf_match; provider_classified; autodiscover_confirms

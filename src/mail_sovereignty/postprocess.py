@@ -275,6 +275,14 @@ MANUAL_OVERRIDES = {
         "domain": "ruetibeilyssach.ch",
         "provider": "infomaniak",
     },  # Rueti bei Lyssach
+    "2056": {
+        "name": "Fétigny-Ménières",
+        "canton": "Kanton Freiburg",
+        "domain": "fetigny-menieres.ch",
+    },  # Missing from Wikidata
+    "6172": {
+        "domain": "gemeinde-bister.ch",
+    },  # Bister VS
 }
 
 
@@ -288,6 +296,19 @@ async def run(data_path: Path) -> None:
     print("Applying manual overrides...")
     dns_relookup = []  # (bfs, domain) pairs needing MX/SPF re-lookup
     for bfs, override in MANUAL_OVERRIDES.items():
+        if bfs not in muni and "name" in override:
+            muni[bfs] = {
+                "bfs": bfs,
+                "name": override["name"],
+                "canton": override.get("canton", ""),
+                "domain": "",
+                "mx": [],
+                "spf": "",
+                "provider": "unknown",
+            }
+            print(f"  {bfs:>5} {override['name']:<30} (added missing municipality)")
+        if bfs not in muni:
+            continue
         if bfs in muni:
             if "domain" in override:
                 muni[bfs]["domain"] = override["domain"]
@@ -435,6 +456,7 @@ async def run(data_path: Path) -> None:
     for m in muni.values():
         counts[m["provider"]] = counts.get(m["provider"], 0) + 1
     data["counts"] = dict(sorted(counts.items()))
+    data["total"] = len(muni)
     data["municipalities"] = dict(sorted(muni.items(), key=lambda kv: int(kv[0])))
 
     remaining = counts.get("unknown", 0)

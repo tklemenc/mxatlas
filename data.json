@@ -1,14 +1,14 @@
 {
   "generated":"2026-03-09T20:50:45Z",
-  "total":2114,
+  "total":2115,
   "counts":{
     "aws":26,
     "google":4,
     "infomaniak":119,
-    "microsoft":1055,
+    "microsoft":1057,
     "sovereign":755,
     "swiss-isp":152,
-    "unknown":3
+    "unknown":2
   },
   "municipalities":{
     "1":{
@@ -12115,6 +12115,24 @@
       "spf":"v=spf1 include:spf.protection.outlook.com ip4:212.71.120.144/28 -all",
       "provider":"microsoft",
       "spf_resolved":"v=spf1 include:spf.protection.outlook.com ip4:212.71.120.144/28 -all v=spf1 ip4:40.92.0.0/15 ip4:40.107.0.0/16 ip4:52.100.0.0/15 ip4:52.102.0.0/16 ip4:52.103.0.0/17 ip4:104.47.0.0/17 ip6:2a01:111:f400::/48 ip6:2a01:111:f403::/49 ip6:2a01:111:f403:8000::/51 ip6:2a01:111:f403:c000::/51 ip6:2a01:111:f403:f000::/52 -all",
+      "mx_asns":[
+        8075
+      ],
+      "autodiscover":{
+        "autodiscover_cname":"autodiscover.outlook.com"
+      }
+    },
+    "2056":{
+      "bfs":"2056",
+      "name":"Fétigny-Ménières",
+      "canton":"Kanton Freiburg",
+      "domain":"fetigny-menieres.ch",
+      "mx":[
+        "fetignymenieres-ch01i.mail.protection.outlook.com"
+      ],
+      "spf":"v=spf1 include:spf.infomaniak.ch include:spf.protection.outlook.com ip4:212.71.120.144/28 -all",
+      "provider":"microsoft",
+      "spf_resolved":"v=spf1 include:spf.infomaniak.ch include:spf.protection.outlook.com ip4:212.71.120.144/28 -all v=spf1 ip4:45.157.188.8/29 ip4:185.125.25.8/29 ip4:83.166.143.168/29 ip4:84.16.66.168/29 ip4:128.65.197.100 ip4:128.65.197.101 ip6:2001:1600:4:17::/64 ip6:2001:1600:7:10::/64 ip6:2001:1600:4:2d::c565 ip6:2001:1600:7:10::c564 ip4:185.125.25.16/29 ip4:45.157.188.16/29 ip4:84.16.66.176/29 ip4:83.166.143.176/29 ip6:2001:1600:19::/48 ip4:84.16.69.64/31 ip4:128.65.197.2/31 include:newsletter.infomaniak.com -all v=spf1 ip4:40.92.0.0/15 ip4:40.107.0.0/16 ip4:52.100.0.0/15 ip4:52.102.0.0/16 ip4:52.103.0.0/17 ip4:104.47.0.0/17 ip6:2a01:111:f400::/48 ip6:2a01:111:f403::/49 ip6:2a01:111:f403:8000::/51 ip6:2a01:111:f403:c000::/51 ip6:2a01:111:f403:f000::/52 -all",
       "mx_asns":[
         8075
       ],
@@ -34897,10 +34915,19 @@
       "bfs":"6172",
       "name":"Bister VS",
       "canton":"Kanton Wallis",
-      "domain":"",
-      "mx":[],
-      "spf":"",
-      "provider":"unknown"
+      "domain":"gemeinde-bister.ch",
+      "mx":[
+        "gemeindebister-ch02b.mail.protection.outlook.com"
+      ],
+      "spf":"v=spf1 include:spf.protection.outlook.com -all",
+      "provider":"microsoft",
+      "spf_resolved":"v=spf1 include:spf.protection.outlook.com -all v=spf1 ip4:40.92.0.0/15 ip4:40.107.0.0/16 ip4:52.100.0.0/15 ip4:52.102.0.0/16 ip4:52.103.0.0/17 ip4:104.47.0.0/17 ip6:2a01:111:f400::/48 ip6:2a01:111:f403::/49 ip6:2a01:111:f403:8000::/51 ip6:2a01:111:f403:c000::/51 ip6:2a01:111:f403:f000::/52 -all",
+      "mx_asns":[
+        8075
+      ],
+      "autodiscover":{
+        "autodiscover_cname":"autodiscover.outlook.com"
+      }
     },
     "6173":{
       "bfs":"6173",

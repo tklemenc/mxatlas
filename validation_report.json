@@ -1,7 +1,7 @@
 {
-  "total": 2114,
-  "average_score": 90.7,
-  "high_confidence_pct": 95.5,
+  "total": 2115,
+  "average_score": 90.8,
+  "high_confidence_pct": 95.6,
   "quality_passed": true,
   "entries": {
     "1": {
@@ -7961,6 +7961,19 @@
       "flags": [
         "spf_strict",
         "mx_spf_match",
+        "provider_classified",
+        "autodiscover_confirms"
+      ]
+    },
+    "2056": {
+      "name": "Fétigny-Ménières",
+      "provider": "microsoft",
+      "domain": "fetigny-menieres.ch",
+      "confidence": 85,
+      "flags": [
+        "spf_strict",
+        "mx_spf_match",
+        "multi_provider_spf:infomaniak+microsoft",
         "provider_classified",
         "autodiscover_confirms"
       ]
@@ -23058,14 +23071,14 @@
     },
     "6172": {
       "name": "Bister VS",
-      "provider": "unknown",
-      "domain": "",
-      "confidence": 0,
+      "provider": "microsoft",
+      "domain": "gemeinde-bister.ch",
+      "confidence": 95,
       "flags": [
-        "no_domain",
-        "no_mx",
-        "no_spf",
-        "provider_unknown"
+        "spf_strict",
+        "mx_spf_match",
+        "provider_classified",
+        "autodiscover_confirms"
       ]
     },
     "6173": {
