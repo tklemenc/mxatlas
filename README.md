@@ -17,6 +17,49 @@ The data pipeline has three steps:
 2. **Postprocess** -- Applies manual overrides for edge cases, retries DNS for unresolved domains, then scrapes websites of still-unclassified municipalities for email addresses.
 3. **Validate** -- Cross-validates MX and SPF records, assigns a confidence score (0-100) to each entry, and generates a validation report.
 
+```mermaid
+flowchart TD
+    trigger["Nightly trigger · 04:00 UTC"] --> wikidata
+
+    subgraph pre ["1 · Preprocess"]
+        wikidata[/"Wikidata SPARQL"/] --> fetch["Fetch ~2100 municipalities"]
+        fetch --> domains["Extract domains +<br/>guess candidates"]
+        domains --> dns["MX + SPF lookups<br/>(3 resolvers)"]
+        dns --> spf_resolve["Resolve SPF includes<br/>& redirects"]
+        spf_resolve --> cname["Follow CNAME chains"]
+        cname --> asn["ASN lookups<br/>(Team Cymru)"]
+        asn --> gateway["Detect gateways<br/>(SeppMail, Cleanmail …)"]
+        gateway --> classify["Classify providers<br/>MX → CNAME → SPF"]
+    end
+
+    classify --> overrides
+
+    subgraph post ["2 · Postprocess"]
+        overrides["Apply manual overrides<br/>(19 edge cases)"] --> retry["Retry DNS<br/>for unknowns"]
+        retry --> scrape_urls["Probe municipal websites<br/>(/kontakt, /contact, /impressum …)"]
+        scrape_urls --> extract["Extract emails<br/>+ decrypt TYPO3 obfuscation"]
+        extract --> scrape_dns["DNS lookup on<br/>email domains"]
+        scrape_dns --> reclassify["Reclassify<br/>resolved entries"]
+    end
+
+    reclassify --> data[("data.json")]
+    data --> score
+
+    subgraph val ["3 · Validate"]
+        score["Confidence scoring · 0–100"] --> gate{"Quality gate<br/>avg ≥ 70 · high-conf ≥ 80%"}
+    end
+
+    gate -- "Pass" --> deploy["Commit & deploy to Pages"]
+    gate -- "Fail" --> issue["Open GitHub issue"]
+
+    style trigger fill:#e8f4fd,stroke:#4a90d9,color:#1a5276
+    style wikidata fill:#e8f4fd,stroke:#4a90d9,color:#1a5276
+    style data fill:#d5f5e3,stroke:#27ae60,color:#1e8449
+    style deploy fill:#d5f5e3,stroke:#27ae60,color:#1e8449
+    style issue fill:#fadbd8,stroke:#e74c3c,color:#922b21
+    style gate fill:#fdebd0,stroke:#e67e22,color:#935116
+```
+
 ## Quick start
 
 ```bash
