@@ -1,4 +1,4 @@
-# MXmap — Where Swiss municipalities host their email
+# MXmap — Email Providers of Swiss Municipalities
 
 [![CI](https://github.com/davidhuser/mxmap/actions/workflows/ci.yml/badge.svg)](https://github.com/davidhuser/mxmap/actions/workflows/ci.yml)
 [![Nightly](https://github.com/davidhuser/mxmap/actions/workflows/nightly.yml/badge.svg)](https://github.com/davidhuser/mxmap/actions/workflows/nightly.yml)

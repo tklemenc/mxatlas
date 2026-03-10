@@ -15,21 +15,21 @@
 <link rel="dns-prefetch" href="https://b.basemaps.cartocdn.com">
 <link rel="dns-prefetch" href="https://c.basemaps.cartocdn.com">
 <link rel="dns-prefetch" href="https://d.basemaps.cartocdn.com">
-<title>MXmap — Email Sovereignty of Swiss Municipalities</title>
-<meta name="description" content="Interactive map showing where Swiss municipalities host their official email. DNS analysis of all ~2,100 municipalities, color-coded by provider. Visualizing the impact of the US CLOUD Act on Swiss digital sovereignty.">
+<title>MXmap — Email Providers of Swiss Municipalities</title>
+<meta name="description" content="Interactive map showing the email providers of all ~2,100 Swiss municipalities, based on DNS analysis of MX and SPF records.">
 <meta name="keywords" content="Switzerland, municipalities, email, sovereignty, CLOUD Act, MX records, SPF, DNS, Microsoft 365, Google Workspace, digital sovereignty, data protection">
 <meta name="author" content="David Huser">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://mxmap.ch/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="MXmap — Email Sovereignty of Swiss Municipalities">
+<meta property="og:title" content="MXmap — Email Providers of Swiss Municipalities">
 <meta property="og:description" content="Interactive map showing where Swiss municipalities host their official email. DNS analysis of all ~2,100 municipalities, color-coded by provider.">
 <meta property="og:url" content="https://mxmap.ch/">
 <meta property="og:locale" content="en_CH">
 <meta property="og:site_name" content="MXmap">
 <meta property="og:image" content="https://mxmap.ch/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="MXmap — Email Sovereignty of Swiss Municipalities">
+<meta name="twitter:title" content="MXmap — Email Providers of Swiss Municipalities">
 <meta name="twitter:description" content="Interactive map showing where Swiss municipalities host their official email. DNS analysis of all ~2,100 municipalities.">
 <meta name="twitter:image" content="https://mxmap.ch/og-image.jpg">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='7' width='28' height='18' rx='2' fill='%231a1a2e'/%3E%3Cpath d='M2 9l14 9 14-9' fill='none' stroke='%2316a34a' stroke-width='2'/%3E%3C/svg%3E">
@@ -76,6 +76,7 @@
   .info-card p { font-size: 13px; color: #444; line-height: 1.5; margin: 0; }
   .info-card a { color: #2563eb; text-decoration: none; }
   .info-card a:hover { text-decoration: underline; }
+  #generated { font-size: 11px; color: #999; margin-top: 4px; }
   .legend-toggle {
     display: none; background: none; border: none; font-size: 13px;
     font-weight: 600; cursor: pointer; padding: 0; color: #333;
@@ -134,7 +135,7 @@
     <h1 class="brand">MXmap</h1>
     <span class="beta-badge" title="Beta status, this website may contain errors">beta</span>
     <span class="separator">|</span>
-    <span class="tagline">Email Sovereignty of Swiss Municipalities</span>
+    <span class="tagline">Email Providers of Swiss Municipalities</span>
   </div>
   <div class="header-right">
     <button class="toggle-info" id="toggle-info" aria-expanded="true" aria-controls="info-bar">About &#9652;</button>
@@ -142,19 +143,25 @@
 </header>
 <section id="info-bar" aria-label="About this project">
 <script>if(window.innerWidth<=600)document.getElementById('info-bar').classList.add('collapsed');</script>
-  <h2 class="info-title">Email Sovereignty of Swiss Municipalities</h2>
+  <h2 class="info-title">Email Providers of Swiss Municipalities</h2>
   <div class="info-grid">
     <div class="info-card">
       <h3>What is this?</h3>
-      <p>This map shows how each of Switzerland's ~2,100 municipalities hosts its official email. Municipalities are color-coded by email provider — green/blue tones indicate domestic or self-hosted infrastructure, while red/purple/amber indicate US hyperscalers subject to the CLOUD Act.</p>
+      <p>A map of all ~2,100 Swiss municipalities showing which provider handles their official email, based on public DNS records. Municipalities are color-coded by provider type: US-based cloud services, Swiss-based providers, or self-hosted infrastructure.</p>
     </div>
     <div class="info-card">
       <h3>Why does it matter?</h3>
-      <p>The US CLOUD Act (2018) lets US authorities force American cloud providers to hand over data — regardless of where it's stored. A substantial amount of Swiss municipalities route official email through US infrastructure, raising concerns about data sovereignty.</p>
+      <p>When a municipality uses a US-based provider, that provider may be subject to the US CLOUD Act (2018). Under this law, US authorities can compel US-headquartered companies to disclose stored data in criminal investigations — regardless of where the data is physically stored. Switzerland's Federal Office of Justice has analyzed the legal implications of this extraterritorial reach.</p>
     </div>
     <div class="info-card">
-      <h3>How is it done?</h3>
-      <p>Built from publicly available data (2026) — municipality domains and their DNS records (MX and SPF). All data and source code are open, created by David Huser and <a href="https://github.com/davidhuser/mxmap" target="_blank">available on GitHub</a>. Found an error? <a href="https://github.com/davidhuser/mxmap/issues" target="_blank">Submit an issue</a>.<br><span id="generated" class="updated"></span></p>
+      <h3>How does it work?</h3>
+      <p>Each municipality's domain is checked via public DNS records (MX for incoming mail routing, SPF for authorized senders). The results are matched against known provider signatures and classified by provider and country of origin. Note: DNS records indicate mail routing, not necessarily data residency. Some providers may offer contractual data localization that is not visible at the DNS level.</p>
+    </div>
+    <div class="info-card">
+      <h3>Open source &amp; open data</h3>
+      <p>The code and data are on <a href="https://github.com/davidhuser/mxmap" target="_blank">GitHub</a>.<br>
+      If you have noticed an error, please <a href="https://github.com/davidhuser/mxmap/issues" target="_blank">submit an issue</a>.</p>
+      <p id="generated"></p>
     </div>
   </div>
 </section>
@@ -168,23 +175,23 @@ if (!CSS.supports('height', '100dvh')) {
   document.body.style.height = window.innerHeight + 'px';
 }
 const COLORS = {
-  microsoft:  '#E83838',  // punchy vivid red — US cloud
-  google:     '#FFAB96',  // bright warm peach — US cloud
-  aws:        '#FF7A5C',  // bright hot coral — US cloud
-  infomaniak: '#78FFD6',  // vivid bright mint — Swiss provider
-  'swiss-isp': '#2EDBA8',  // neon-ish seafoam — Swiss ISP
-  sovereign:  '#10B898',  // vivid bright teal — self-hosted (best)
-  unknown:    '#BFBFBF'   // neutral mid-gray with hatching
+  microsoft:      '#E83838',  // punchy vivid red — US cloud
+  google:         '#FFAB96',  // bright warm peach — US cloud
+  aws:            '#FF7A5C',  // bright hot coral — US cloud
+  infomaniak:     '#78FFD6',  // vivid bright mint — Swiss provider
+  'swiss-isp':    '#2EDBA8',  // neon-ish seafoam — Swiss ISP
+  'self-hosted':  '#10B898',  // vivid bright teal — self-hosted
+  unknown:        '#BFBFBF'   // neutral mid-gray with hatching
 };
 
 const LABELS = {
-  microsoft:  'Microsoft 365',
-  google:     'Google Workspace',
-  aws:        'Amazon Web Services',
-  infomaniak: 'Infomaniak',
-  'swiss-isp': 'Swiss ISP',
-  sovereign:  'Sovereign / Self-hosted',
-  unknown:    'Unknown'
+  microsoft:      'Microsoft 365',
+  google:         'Google Workspace',
+  aws:            'Amazon Web Services',
+  infomaniak:     'Infomaniak',
+  'swiss-isp':    'Swiss ISP',
+  'self-hosted':  'Self-hosted',
+  unknown:        'Unknown'
 };
 
 function escapeHtml(str) {
@@ -375,11 +382,11 @@ async function loadData() {
   // Build lookup by BFS number
   const muni = dnsData.municipalities;
 
-  // Show generation timestamp
+  // Show dataset info
   if (dnsData.generated) {
     const date = new Date(dnsData.generated);
     document.getElementById('generated').textContent =
-      'Data last updated: ' + date.toLocaleString('de-CH', { dateStyle: 'medium', timeStyle: 'short' });
+      'Updated ' + date.toLocaleString('de-CH', { dateStyle: 'medium', timeStyle: 'short' });
   }
 
   // Legend with counts
@@ -392,8 +399,8 @@ async function loadData() {
       '<button class="legend-toggle" aria-label="Toggle legend" aria-expanded="' + (!isMobile) + '">' + (isMobile ? 'Legend \u25B8' : '') + '</button>' +
       '<div class="legend-content">' +
       '<strong>Email Provider</strong>' +
-      legendGroupHtml('US Hyperscaler', ['microsoft', 'aws', 'google'], dnsData.counts) +
-      legendGroupHtml('Domestic / Sovereign', ['sovereign', 'swiss-isp', 'infomaniak'], dnsData.counts) +
+      legendGroupHtml('US-based providers', ['microsoft', 'aws', 'google'], dnsData.counts) +
+      legendGroupHtml('Swiss-based', ['self-hosted', 'swiss-isp', 'infomaniak'], dnsData.counts) +
       '</div>';
     L.DomEvent.disableClickPropagation(div);
     return div;
