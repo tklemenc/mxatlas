@@ -45,7 +45,7 @@
     display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
   }
   .header-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
-  .brand { font-size: 17px; font-weight: 700; white-space: nowrap; }
+  .brand { font-size: 17px; font-weight: 700; white-space: nowrap; margin: 0; }
   .beta-badge {
     font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
     background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
@@ -64,7 +64,7 @@
   .toggle-info:hover { background: rgba(255,255,255,0.25); color: #fff; }
   #info-bar {
     background: #f8f9fb; border-bottom: 1px solid #e2e4e8; overflow: hidden; flex-shrink: 0;
-    max-height: 600px; transition: max-height 350ms ease, padding 350ms ease;
+    max-height: 600px;
     padding: 16px 20px;
   }
   #info-bar.collapsed { max-height: 0; padding-top: 0; padding-bottom: 0; }
@@ -137,9 +137,9 @@
     </pattern>
   </defs>
 </svg>
-<div id="header">
+<header id="header">
   <div class="header-left">
-    <span class="brand">MXmap</span>
+    <h1 class="brand">MXmap</h1>
     <span class="beta-badge" title="Beta status, this website may contain errors">beta</span>
     <span class="separator">|</span>
     <span class="tagline">Email Sovereignty of Swiss Municipalities</span>
@@ -147,8 +147,8 @@
   <div class="header-right">
     <button class="toggle-info" id="toggle-info" aria-expanded="true" aria-controls="info-bar">About &#9652;</button>
   </div>
-</div>
-<div id="info-bar">
+</header>
+<section id="info-bar" aria-label="About this project">
   <h2 class="info-title">Email Sovereignty of Swiss Municipalities</h2>
   <div class="info-grid">
     <div class="info-card">
@@ -164,10 +164,10 @@
       <p>Built from publicly available data (2026) — municipality domains and their DNS records (MX and SPF). All data and source code are open, created by David Huser and <a href="https://github.com/davidhuser/mxmap" target="_blank">available on GitHub</a>. Found an error? <a href="https://github.com/davidhuser/mxmap/issues" target="_blank">Submit an issue</a>.<br><span id="generated" class="updated"></span></p>
     </div>
   </div>
-</div>
-<div id="map" role="application" aria-label="Interactive map of Swiss municipality email providers">
+</section>
+<main id="map" role="application" aria-label="Interactive map of Swiss municipality email providers">
   <div id="map-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1000;background:rgba(255,255,255,0.85);font-size:15px;color:#555;">Loading map data&hellip;</div>
-</div>
+</main>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -333,11 +333,13 @@ function toggleLegend() {
   const legend = document.querySelector('.legend');
   const btn = legend.querySelector('.legend-toggle');
   legend.classList.toggle('legend-collapsed');
-  btn.textContent = legend.classList.contains('legend-collapsed') ? 'Legend \u25B8' : '\u2715';
+  const collapsed = legend.classList.contains('legend-collapsed');
+  btn.textContent = collapsed ? 'Legend \u25B8' : '\u2715';
+  btn.setAttribute('aria-expanded', String(!collapsed));
 }
 
-document.getElementById('info-bar').addEventListener('transitionend', function (e) {
-  if (e.propertyName === 'max-height') map.invalidateSize();
+document.getElementById('toggle-info').addEventListener('click', function () {
+  map.invalidateSize();
 });
 
 function legendItemHtml(key, counts) {
@@ -383,7 +385,7 @@ async function loadData() {
     const div = L.DomUtil.create('div', 'legend');
     if (isMobile) div.classList.add('legend-collapsed');
     div.innerHTML =
-      '<button class="legend-toggle">' + (isMobile ? 'Legend \u25B8' : '') + '</button>' +
+      '<button class="legend-toggle" aria-label="Toggle legend" aria-expanded="' + (!isMobile) + '">' + (isMobile ? 'Legend \u25B8' : '') + '</button>' +
       '<div class="legend-content">' +
       '<strong>Email Provider</strong>' +
       legendGroupHtml('US Hyperscaler', ['microsoft', 'aws', 'google'], dnsData.counts) +
