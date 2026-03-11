@@ -11,6 +11,11 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+!vendor/leaflet/dist/
+!vendor/leaflet/dist/leaflet.css
+!vendor/leaflet/dist/leaflet.js
+!vendor/topojson-client/dist/
+!vendor/topojson-client/dist/topojson-client.min.js
 downloads/
 eggs/
 .eggs/

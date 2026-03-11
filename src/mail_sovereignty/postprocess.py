@@ -476,7 +476,7 @@ async def run(data_path: Path) -> None:
         semaphore = asyncio.Semaphore(CONCURRENCY_POSTPROCESS)
         async with httpx.AsyncClient(
             headers={
-                "User-Agent": "mxmap.ch/1.0 (https://github.com/davidhuser/mxmap)"
+                "User-Agent": "mxatlas/1.0 (https://github.com/tklemenc/mxatlas)"
             },
             follow_redirects=True,
         ) as client:

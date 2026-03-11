@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "mxmap"
+name = "mxatlas"
 version = "0.1.0"
-description = "Interactive map showing where Swiss municipalities host their email"
+description = "Interactive map showing where German municipalities host their email"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -17,6 +17,8 @@ dependencies = [
 preprocess = "mail_sovereignty.cli:preprocess"
 postprocess = "mail_sovereignty.cli:postprocess"
 validate = "mail_sovereignty.cli:validate"
+build-data-de = "mail_sovereignty.cli:build_data_de"
+build-site-de = "mail_sovereignty.cli:build_site_de"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mail_sovereignty"]

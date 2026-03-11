@@ -1,65 +1,34 @@
-# MXmap — Email Providers of Swiss Municipalities
+# MXatlas — Email Providers of German Municipalities
 
-[![CI](https://github.com/davidhuser/mxmap/actions/workflows/ci.yml/badge.svg)](https://github.com/davidhuser/mxmap/actions/workflows/ci.yml)
-[![Nightly](https://github.com/davidhuser/mxmap/actions/workflows/nightly.yml/badge.svg)](https://github.com/davidhuser/mxmap/actions/workflows/nightly.yml)
+An interactive map showing where German municipalities host their email infrastructure — whether with US hyperscalers, municipal IT providers, commercial hosters or other setups.
 
-An interactive map showing where Swiss municipalities host their email — whether with US hyperscalers (Microsoft, Google, AWS) or Swiss providers or other solutions.
+**[View the live map](https://mxatlas.de)**
 
-**[View the live map](https://mxmap.ch)**
+[![og-image.png](og-image.png)](https://mxatlas.de)
 
-[![Screenshot of MXmap](og-image.jpg)](https://mxmap.ch)
+## Current status
 
-## How it works
+This repository currently publishes a static snapshot. The map is not rebuilt continuously from live DNS or live municipality data.
 
-The data pipeline has three steps:
+The current Germany dataset was built in three stages:
 
-1. **Preprocess** -- Fetches all ~2100 Swiss municipalities from Wikidata, performs MX and SPF DNS lookups on their official domains, and classifies each municipality's email provider.
-2. **Postprocess** -- Applies manual overrides for edge cases, retries DNS for unresolved domains, then scrapes websites of still-unclassified municipalities for email addresses.
-3. **Validate** -- Cross-validates MX and SPF records, assigns a confidence score (0-100) to each entry, and generates a validation report.
+1. **Domain curation** -- Municipality domains were assembled from Wikidata website hints and then cleaned up with deterministic review steps and manual corrections for ambiguous cases.
+2. **DNS snapshot** -- DNS records for the curated domain set were queried in batch and stored as a point-in-time snapshot.
+3. **Classification** -- The DNS snapshot was mapped to provider/platform classes and exported into the static frontend data files.
+
+The published provider labels should be read as indicative technical classifications derived from public DNS signals, not as official statements by the municipalities.
 
 ```mermaid
 flowchart TD
-    trigger["Nightly trigger"] --> wikidata
+    sources["CSV + XLSX + Wikidata"] --> domains["Curate municipality domains<br/>(review + manual fixes)"]
+    domains --> dns["Batch DNS snapshot"]
+    dns --> classify["Classify providers<br/>and platforms"]
+    classify --> data[("data.json")]
+    data --> map["Leaflet + TopoJSON map"]
 
-    subgraph pre ["1 · Preprocess"]
-        wikidata[/"Wikidata SPARQL"/] --> fetch["Fetch ~2100 municipalities"]
-        fetch --> domains["Extract domains +<br/>guess candidates"]
-        domains --> dns["MX + SPF lookups<br/>(3 resolvers)"]
-        dns --> spf_resolve["Resolve SPF includes<br/>& redirects"]
-        spf_resolve --> cname["Follow CNAME chains"]
-        cname --> asn["ASN lookups<br/>(Team Cymru)"]
-        asn --> autodiscover["Autodiscover DNS<br/>(CNAME + SRV)"]
-        autodiscover --> gateway["Detect gateways<br/>(SeppMail, Barracuda,<br/>Proofpoint, Sophos ...)"]
-        gateway --> classify["Classify providers<br/>MX → CNAME → SPF → Autodiscover"]
-    end
-
-    classify --> overrides
-
-    subgraph post ["2 · Postprocess"]
-        overrides["Apply manual overrides<br/>(19 edge cases)"] --> retry["Retry DNS<br/>for unknowns"]
-        retry --> scrape_urls["Probe municipal websites<br/>(/kontakt, /contact, /impressum …)"]
-        scrape_urls --> extract["Extract emails<br/>+ decrypt TYPO3 obfuscation"]
-        extract --> scrape_dns["DNS lookup on<br/>email domains"]
-        scrape_dns --> reclassify["Reclassify<br/>resolved entries"]
-    end
-
-    reclassify --> data[("data.json")]
-    data --> score
-
-    subgraph val ["3 · Validate"]
-        score["Confidence scoring · 0–100"] --> gwarn["Flag potential<br/>unknown gateways"]
-        gwarn --> gate{"Quality gate<br/>avg ≥ 70 · high-conf ≥ 80%"}
-    end
-
-    gate -- "Pass" --> deploy["Commit & deploy to Pages"]
-    gate -- "Fail" --> issue["Open GitHub issue"]
-
-    style trigger fill:#e8f4fd,stroke:#4a90d9,color:#1a5276
-    style wikidata fill:#e8f4fd,stroke:#4a90d9,color:#1a5276
+    style sources fill:#e8f4fd,stroke:#4a90d9,color:#1a5276
     style data fill:#d5f5e3,stroke:#27ae60,color:#1e8449
-    style deploy fill:#d5f5e3,stroke:#27ae60,color:#1e8449
-    style issue fill:#fadbd8,stroke:#e74c3c,color:#922b21
-    style gate fill:#fdebd0,stroke:#e67e22,color:#935116
+    style map fill:#d5f5e3,stroke:#27ae60,color:#1e8449
 ```
 
 ## Quick start
@@ -67,9 +36,11 @@ flowchart TD
 ```bash
 uv sync
 
-uv run preprocess
-uv run postprocess
-uv run validate
+# Rebuild data.json from the checked CSV snapshot
+uv run build-data-de
+
+# or rebuild the committed site data in-place
+uv run build-site-de
 
 # Serve the map locally
 python -m http.server
@@ -95,5 +66,20 @@ uv run ruff format src tests
 
 ## Contributing
 
-If you spot a misclassification, please open an issue with the BFS number and the correct provider.
-For municipalities where automated detection fails, corrections can be added to the `MANUAL_OVERRIDES` dict in `src/mail_sovereignty/postprocess.py`.
+If you spot a misclassification, please open an issue with the municipality key (`gkz8 / Gemeindekennzahl`) and the expected provider.
+
+## Sources and licensing
+
+- Destatis / Statistikportal municipality reference data, used in modified form
+- Wikidata (CC0)
+- © GeoBasis-DE / BKG geometry data, license `dl-de/by-2-0`, used in modified form
+- DNS snapshot, joins and provider classifications by this project
+
+See [DATA_SOURCES.md](DATA_SOURCES.md) for the current source and methodology notes.
+
+## Automation strategy
+
+- `build-data-de` rebuilds `data.json` from the committed Germany classification CSV snapshot.
+- `municipalities.topo.json` is currently treated as a checked-in static asset, not a nightly-generated artifact.
+- The published site is currently a static snapshot rather than a continuously refreshed pipeline.
+- GitHub Actions should deploy already-reviewed assets rather than re-running domain discovery or DNS collection automatically.
